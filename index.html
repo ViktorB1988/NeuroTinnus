@@ -16,7 +16,7 @@ body.theme-a{
   --track:#1e2240;--playing:#1a1f3a;--divider:#1e2240;
   --freq:#7986cb;--freq-em:#5c6bc0;--dot-done:#3949ab;--status:#7986cb;
   --arc-track:#1e2240;--arc-fill:#5c6bc0;--arc-thumb:#7986cb;
-  --noise-card:#0d1933;--noise-border:#1a3a6a;
+  --noise-card:#060a14;--noise-border:#1e2240;
   --tab-bg:#0e1020;--tab-border:#1e2240;--tab-active:#7986cb;--tab-inactive:#2a3366;
   --onboard:#0d1022;--onboard-border:#2a3060;
   --section-label:#3d4a8a;
@@ -30,7 +30,7 @@ body.theme-b{
   --track:#f0e8dc;--playing:#fdf5ec;--divider:#e0d4c4;
   --freq:#8b4513;--freq-em:#c4a882;--dot-done:#c4a882;--status:#8b4513;
   --arc-track:#f0e8dc;--arc-fill:#c4914a;--arc-thumb:#8b4513;
-  --noise-card:#fdf5ec;--noise-border:#c4914a;
+  --noise-card:#f5e8d0;--noise-border:#e0d4c4;
   --tab-bg:#fff;--tab-border:#e0d4c4;--tab-active:#8b4513;--tab-inactive:#c4a882;
   --onboard:#f0ebe3;--onboard-border:#d4c4b0;
   --section-label:#c4a882;
@@ -44,7 +44,7 @@ body.theme-c{
   --track:#d4ede9;--playing:#e0f5f0;--divider:#b2ddd6;
   --freq:#0d4a3e;--freq-em:#7ab8b0;--dot-done:#7ab8b0;--status:#1d8a74;
   --arc-track:#d4ede9;--arc-fill:#1d8a74;--arc-thumb:#0d4a3e;
-  --noise-card:#e0f5f0;--noise-border:#1d8a74;
+  --noise-card:#c0e8e0;--noise-border:#b2ddd6;
   --tab-bg:#0d4a3e;--tab-border:#1a6b5a;--tab-active:#e0f5f0;--tab-inactive:#3d8a7a;
   --onboard:#e4f5f2;--onboard-border:#90cdc5;
   --section-label:#7ab8b0;
@@ -58,10 +58,9 @@ body{
   display:flex;flex-direction:column;align-items:center;
   transition:background 0.25s;
 }
-
 /* ── App shell ───────────────────────────────────────────────────────────── */
 .app-shell{
-  width:100%;max-width:420px;
+  width:100%;max-width:720px;
   display:flex;flex-direction:column;
   height:100vh;height:100dvh;
   position:relative;
@@ -73,6 +72,7 @@ body{
   display:flex;align-items:center;justify-content:space-between;
   border-bottom:0.5px solid var(--topbar-border);
   flex-shrink:0;transition:background 0.25s,border-color 0.25s;
+  position:relative;z-index:10;
 }
 .topbar h1{font-size:17px;font-weight:600;color:var(--topbar-text);letter-spacing:-0.2px}
 .theme-switcher{display:flex;gap:7px;align-items:center}
@@ -81,18 +81,23 @@ body{
 .theme-dot.active{box-shadow:0 0 0 2px var(--topbar-text)}
 
 /* ── Tab content area ────────────────────────────────────────────────────── */
-.tab-content{flex:1;overflow-y:auto;overflow-x:hidden}
-.tab-panel{display:none;padding:16px 16px 20px;flex-direction:column;gap:12px}
-.tab-panel.active{display:flex}
+.tab-content{flex:1;display:flex;flex-direction:column;overflow:hidden;width:100%;}
+.tab-panel{display:none;flex:1;flex-direction:column;gap:12px;
+           padding:16px 16px 20px;overflow-y:auto;width:100%;}
+.tab-panel.active{display:flex;}
 
 /* ── Bottom tab bar ──────────────────────────────────────────────────────── */
 .bottom-tabs{
   background:var(--tab-bg);border-top:0.5px solid var(--tab-border);
-  display:flex;flex-shrink:0;transition:background 0.25s,border-color 0.25s;
+  display:grid;grid-template-columns:repeat(2,1fr);
+  flex-shrink:0;width:100%;
+  position:relative;z-index:10;
+  transition:background 0.25s,border-color 0.25s;
 }
 .tab-btn{
-  flex:1;padding:9px 0 7px;display:flex;flex-direction:column;
+  padding:9px 0 7px;display:flex;flex-direction:column;
   align-items:center;gap:3px;border:none;background:transparent;cursor:pointer;
+  width:100%;
 }
 .tab-btn .t-icon{font-size:20px;color:var(--tab-inactive);transition:color 0.2s}
 .tab-btn .t-lbl{font-size:10px;font-weight:500;color:var(--tab-inactive);letter-spacing:0.3px;transition:color 0.2s}
@@ -106,7 +111,9 @@ body{
 .card.noise-card{border-width:1.5px;border-color:var(--noise-border);background:var(--noise-card)}
 .section-lbl{font-size:10px;font-weight:600;color:var(--section-label);text-transform:uppercase;letter-spacing:0.8px;padding:0 3px}
 
-/* ── Arc dial ────────────────────────────────────────────────────────────── */
+input[type=range]:disabled{opacity:0.35;cursor:not-allowed;}
+input[type=range]:disabled::-webkit-slider-thumb{cursor:not-allowed;}
+input[type=range]:disabled::-moz-range-thumb{cursor:not-allowed;}
 .arc-card{background:var(--card);border-radius:16px;padding:14px 15px 10px;border:0.5px solid var(--border);text-align:center}
 .arc-hint{font-size:11px;color:var(--muted);margin-bottom:4px}
 .arc-svg-wrap{width:100%;max-width:240px;margin:0 auto;cursor:grab;touch-action:none;user-select:none}
@@ -126,7 +133,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 /* ── Play hero ───────────────────────────────────────────────────────────── */
 .play-hero{display:flex;flex-direction:column;align-items:center;gap:8px;padding:6px 0}
 .play-ring-wrap{position:relative;width:88px;height:88px;display:flex;align-items:center;justify-content:center}
-.pulse-ring{position:absolute;inset:0;border-radius:50%;border:1.5px solid var(--primary);opacity:0.3;pointer-events:none}
+.pulse-ring{position:absolute;inset:0;border-radius:50%;border:1.5px solid var(--primary);opacity:0;pointer-events:none}
 @keyframes pulse-ring{0%{transform:scale(1);opacity:0.35}70%{transform:scale(1.18);opacity:0}100%{transform:scale(1.18);opacity:0}}
 .main-btn-pulse .pulse-ring{animation:pulse-ring 1.8s ease-out infinite}
 .play-lbl{font-size:11px;font-weight:500;color:var(--muted);letter-spacing:0.4px}
@@ -218,7 +225,8 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 
       <!-- Arc dial -->
       <div class="arc-card">
-        <div class="arc-hint">What does your tinnitus frequency sound like?</div>
+        <div class="arc-hint" style="margin-bottom:10px">What does your tinnitus frequency sound like?</div>
+        <div class="arc-freq-display" id="freq-display" style="margin-bottom:10px">2660&nbsp;<em>Hz</em></div>
         <div class="arc-svg-wrap" id="arc-wrap" aria-label="Tinnitus frequency dial">
           <svg id="arc-svg" viewBox="0 0 220 95" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;overflow:visible">
             <!-- Background arc -->
@@ -232,8 +240,6 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
             <text id="arc-lbl-max" text-anchor="end"    font-size="10" font-family="Figtree,sans-serif">12 kHz</text>
           </svg>
         </div>
-        <div class="arc-freq-display" id="freq-display">2660&nbsp;<em>Hz</em></div>
-        <!-- Hidden range input keeps the value; arc drag updates it -->
         <input type="range" id="tinnitus-slider" min="100" max="12000" step="10" value="2660" style="display:none">
         <div class="arc-row">
           <span style="font-size:11px;color:var(--muted)">Preview your tone</span>
@@ -277,22 +283,45 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
             <button class="noise-pill" data-noise="grey">Grey</button>
           </div>
         </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <div style="height:0.5px;background:var(--border);flex:1"></div>
+          <span style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;white-space:nowrap">Nature</span>
+          <div style="height:0.5px;background:var(--border);flex:1"></div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px">
+          <button class="noise-pill" data-noise="rain">🌧 Rain</button>
+          <button class="noise-pill" data-noise="ocean">🌊 Ocean</button>
+          <button class="noise-pill" data-noise="wind">🍃 Wind</button>
+          <button class="noise-pill" data-noise="birds-synth">🐦 Birds - synth</button>
+        </div>
         <div class="vol-strip" style="margin-bottom:8px">
           <span class="vol-lbl" style="font-size:13px">Volume</span>
           <input type="range" id="noise-vol" min="0" max="100" step="1" value="50">
           <span class="vol-val" id="noise-vol-lbl">50%</span>
         </div>
-        <div class="vol-strip">
+        <div class="vol-strip" id="noise-freq-row">
           <span class="vol-lbl" style="font-size:13px">Frequency</span>
           <input type="range" id="noise-freq-sl" min="100" max="12000" step="10" value="1000">
           <span class="vol-val" id="noise-freq-lbl">1 kHz</span>
+        </div>
+        <div class="check-row">
+          <input type="checkbox" id="rand-noise-vol">
+          <label for="rand-noise-vol">Randomize volume</label>
+        </div>
+        <div style="margin-top:10px;transition:opacity 0.2s" id="noise-speed-row">
+          <input type="range" id="noise-speed-sl" min="0" max="2" step="1" value="1" disabled style="width:100%;margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between">
+            <span class="speed-lbl" data-val="0" style="font-size:10px;cursor:pointer">Mild</span>
+            <span class="speed-lbl" data-val="1" style="font-size:10px;cursor:pointer;color:var(--primary);font-weight:600">Medium</span>
+            <span class="speed-lbl" data-val="2" style="font-size:10px;cursor:pointer">Aggressive</span>
+          </div>
         </div>
       </div>
 
     </div><!-- /panel-session -->
 
-    <!-- ── TONES tab ──────────────────────────────────────────────────────── -->
-    <div class="tab-panel" id="panel-tones">
+    <!-- ── SETTINGS tab ──────────────────────────────────────────────────── -->
+    <div class="tab-panel" id="panel-settings">
 
       <div class="section-lbl">Waveform</div>
       <div class="card">
@@ -329,11 +358,6 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
         </div>
       </div>
 
-    </div><!-- /panel-tones -->
-
-    <!-- ── SETTINGS tab ───────────────────────────────────────────────────── -->
-    <div class="tab-panel" id="panel-settings">
-
       <div class="section-lbl">Therapy Tones Volume</div>
       <div class="card">
         <div id="therapy-rows"></div>
@@ -353,11 +377,6 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
       <span class="t-icon">◎</span>
       <div class="t-pip"></div>
       <span class="t-lbl">Session</span>
-    </button>
-    <button class="tab-btn" data-panel="panel-tones">
-      <span class="t-icon">♪</span>
-      <div class="t-pip"></div>
-      <span class="t-lbl">Tones</span>
     </button>
     <button class="tab-btn" data-panel="panel-settings">
       <span class="t-icon">⚙</span>
@@ -449,6 +468,7 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
     document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById(btn.dataset.panel).classList.add('active');
+    document.querySelector('.tab-content').scrollTop = 0;
   });
 });
 
@@ -776,58 +796,290 @@ let noiseFreqHz=saved.noiseFreqHz||1000;
 
 document.querySelectorAll('.noise-pill').forEach(b=>b.classList.toggle('active',b.dataset.noise===noiseType));
 
+const NOISE_TYPES_STANDARD = ['white','pink','brown','blue','violet','grey'];
+const NOISE_TYPES_NATURE   = ['rain','ocean','wind','birds-synth'];
+let noiseExtraNodes = []; // additional nodes for nature sounds
+let birdsTimer = null;
+
+function isNatureSound(t){ return NOISE_TYPES_NATURE.includes(t); }
+
 function buildNoiseBuffer(type){
   const rate=ctx.sampleRate,size=rate*2;
   const buf=ctx.createBuffer(1,size,rate),d=buf.getChannelData(0);
-  if(type==='white'){
-    for(let i=0;i<size;i++)d[i]=Math.random()*2-1;
-  } else if(type==='pink'){
+  if(type==='white'){for(let i=0;i<size;i++)d[i]=Math.random()*2-1;}
+  else if(type==='pink'){
     let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
     for(let i=0;i<size;i++){const w=Math.random()*2-1;b0=0.99886*b0+w*0.0555179;b1=0.99332*b1+w*0.0750759;b2=0.96900*b2+w*0.1538520;b3=0.86650*b3+w*0.3104856;b4=0.55000*b4+w*0.5329522;b5=-0.7616*b5-w*0.0168980;d[i]=(b0+b1+b2+b3+b4+b5+b6+w*0.5362)/4;b6=w*0.115926;}
   } else if(type==='brown'){
     let last=0;for(let i=0;i<size;i++){const w=Math.random()*2-1;last=(last+0.02*w)/1.02;d[i]=last*3.5;}
   } else if(type==='blue'){
-    // Blue noise: emphasises high frequencies (differentiated white)
-    let last=0;
-    for(let i=0;i<size;i++){const w=Math.random()*2-1;d[i]=(w-last)*0.5;last=w;}
+    let last=0;for(let i=0;i<size;i++){const w=Math.random()*2-1;d[i]=(w-last)*0.5;last=w;}
   } else if(type==='violet'){
-    // Violet noise: double-differentiated, even brighter
-    let lastW=0,lastB=0;
-    for(let i=0;i<size;i++){const w=Math.random()*2-1;const blue=(w-lastW)*0.5;d[i]=(blue-lastB)*0.5;lastB=blue;lastW=w;}
+    let lastW=0,lastB=0;for(let i=0;i<size;i++){const w=Math.random()*2-1;const blue=(w-lastW)*0.5;d[i]=(blue-lastB)*0.5;lastB=blue;lastW=w;}
   } else if(type==='grey'){
-    // Grey noise: white noise shaped to sound perceptually flat (A-weighted approximation)
-    // Achieved via a gentle mid-frequency boost and bass/treble roll-off using IIR-style filter
-    let b0=0,b1=0;
-    for(let i=0;i<size;i++){
-      const w=Math.random()*2-1;
-      b0=0.9*b0+w*0.1; // low-pass for bass
-      b1=0.4*b1+w*0.6; // mid pass
-      d[i]=Math.max(-1,Math.min(1,(b1-b0*0.5)*1.2));
-    }
+    let b0=0,b1=0;for(let i=0;i<size;i++){const w=Math.random()*2-1;b0=0.9*b0+w*0.1;b1=0.4*b1+w*0.6;d[i]=Math.max(-1,Math.min(1,(b1-b0*0.5)*1.2));}
+  } else {
+    // fallback for nature-type buffer requests (rain/ocean/wind base)
+    let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+    for(let i=0;i<size;i++){const w=Math.random()*2-1;b0=0.99886*b0+w*0.0555179;b1=0.99332*b1+w*0.0750759;b2=0.96900*b2+w*0.1538520;b3=0.86650*b3+w*0.3104856;b4=0.55000*b4+w*0.5329522;b5=-0.7616*b5-w*0.0168980;d[i]=(b0+b1+b2+b3+b4+b5+b6+w*0.5362)/4;b6=w*0.115926;}
   }
   return buf;
 }
+
 const NOISE_FADE_IN=0.5,NOISE_FADE_OUT=0.3;
+
+
+
+function startNatureGraph(type, gainNode) {
+  // Returns array of extra nodes for later cleanup
+  const nodes = [];
+  if (type==='rain') {
+    const rate=ctx.sampleRate;
+
+    // All layers feed a pre-output gain so we can add a shared delay
+    const pre=ctx.createGain(); pre.gain.value=1; pre.connect(gainNode);
+
+    // ── Layer 1: Base hiss ───────────────────────────────────────────────
+    // White noise → HPF (removes rumble) → LPF (softens extreme hiss)
+    const src1=ctx.createBufferSource(); src1.buffer=buildNoiseBuffer('white'); src1.loop=true;
+    const hpf=ctx.createBiquadFilter(); hpf.type='highpass'; hpf.frequency.value=250;
+    const lpf=ctx.createBiquadFilter(); lpf.type='lowpass';  lpf.frequency.value=8500;
+    const hissG=ctx.createGain(); hissG.gain.value=0.55;
+    src1.connect(hpf); hpf.connect(lpf); lpf.connect(hissG); hissG.connect(pre);
+    src1.start();
+
+    // ── Layer 2: Drop texture ────────────────────────────────────────────
+    // White noise bandpassed around the "patter" frequency range,
+    // amplitude-modulated by a fast noise buffer so it sounds like
+    // many overlapping drops rather than a smooth hiss.
+    const src2=ctx.createBufferSource(); src2.buffer=buildNoiseBuffer('white'); src2.loop=true;
+    const bpf=ctx.createBiquadFilter(); bpf.type='bandpass'; bpf.frequency.value=1400; bpf.Q.value=0.6;
+    const texG=ctx.createGain(); texG.gain.value=0;  // driven by modulator
+
+    // Fast modulation buffer: rectified random walk (≈8ms time constant)
+    // gives a positive-only signal that feels like a dense stream of drops
+    const modSz=rate*3;
+    const modBuf=ctx.createBuffer(1,modSz,rate); const md=modBuf.getChannelData(0);
+    let mL=0;
+    for(let i=0;i<modSz;i++){const w=Math.random()*2-1;mL=mL*0.985+w*0.015;md[i]=Math.abs(mL);}
+    // Smooth loop seam
+    const bl=Math.min(2000,modSz/4);
+    for(let i=0;i<bl;i++){const t=i/bl;md[modSz-bl+i]=md[modSz-bl+i]*(1-t)+md[i]*t;}
+    const modSrc=ctx.createBufferSource(); modSrc.buffer=modBuf; modSrc.loop=true;
+    const modG=ctx.createGain(); modG.gain.value=0.45;
+    modSrc.connect(modG); modG.connect(texG.gain);
+    src2.connect(bpf); bpf.connect(texG); texG.connect(pre);
+    src2.start(); modSrc.start();
+
+    // ── Layer 3: Low body ────────────────────────────────────────────────
+    // Brown noise → aggressive lowpass gives a subtle low-frequency weight
+    const src3=ctx.createBufferSource(); src3.buffer=buildNoiseBuffer('brown'); src3.loop=true;
+    const lpf2=ctx.createBiquadFilter(); lpf2.type='lowpass'; lpf2.frequency.value=220;
+    const bodyG=ctx.createGain(); bodyG.gain.value=0.18;
+    src3.connect(lpf2); lpf2.connect(bodyG); bodyG.connect(pre);
+    src3.start();
+
+    // ── Shared delay (room reflection) ───────────────────────────────────
+    // Feeds from pre → delay → gainNode (parallel, not series)
+    const delay=ctx.createDelay(0.12); delay.delayTime.value=0.038;
+    const delG=ctx.createGain(); delG.gain.value=0.14;
+    pre.connect(delay); delay.connect(delG); delG.connect(gainNode);
+
+    // ── Slow intensity drift ─────────────────────────────────────────────
+    // Very slow random walk on the hiss gain for a natural "rainfall shifting" feel
+    const dSz=rate*10;
+    const dBuf=ctx.createBuffer(1,dSz,rate); const dd=dBuf.getChannelData(0);
+    let dL=0;
+    for(let i=0;i<dSz;i++){const w=Math.random()*2-1;dL=(dL+0.0002*w)/1.0002;dd[i]=dL;}
+    const bl2=Math.min(4000,dSz/4);
+    for(let i=0;i<bl2;i++){const t=i/bl2;dd[dSz-bl2+i]=dd[dSz-bl2+i]*(1-t)+dd[i]*t;}
+    const driftSrc=ctx.createBufferSource(); driftSrc.buffer=dBuf; driftSrc.loop=true;
+    const driftG=ctx.createGain(); driftG.gain.value=0.08;
+    driftSrc.connect(driftG); driftG.connect(gainNode.gain); driftSrc.start();
+
+    // ── Individual drops ─────────────────────────────────────────────────
+    // Two sizes: frequent small drops (high freq) + occasional large drops (low freq)
+    // Fast attack + exponential decay = realistic water impact character
+    let dropTimer1=null, dropTimer2=null;
+
+    function scheduleSmallDrop(){
+      if(!noisePlaying)return;
+      const now=ctx.currentTime;
+      const freq=1800+Math.random()*3200;
+      const attack=0.002+Math.random()*0.004;
+      const decay=0.025+Math.random()*0.04;
+      const peak=0.12+Math.random()*0.18;
+
+      const dSz=Math.floor(rate*0.15);
+      const dBuf=ctx.createBuffer(1,dSz,rate),dd=dBuf.getChannelData(0);
+      for(let i=0;i<dSz;i++)dd[i]=Math.random()*2-1;
+      const dSrc=ctx.createBufferSource(); dSrc.buffer=dBuf;
+      const bpf=ctx.createBiquadFilter(); bpf.type='bandpass'; bpf.frequency.value=freq; bpf.Q.value=3.5;
+      const dg=ctx.createGain();
+      dg.gain.setValueAtTime(0,now);
+      dg.gain.linearRampToValueAtTime(peak,now+attack);
+      dg.gain.setTargetAtTime(0,now+attack,decay); // exponential decay
+      dSrc.connect(bpf);bpf.connect(dg);dg.connect(gainNode);
+      dSrc.start(); dSrc.stop(now+0.15);
+      dropTimer1=setTimeout(scheduleSmallDrop, 40+Math.random()*130);
+    }
+
+    function scheduleLargeDrop(){
+      if(!noisePlaying)return;
+      const now=ctx.currentTime;
+      const freq=350+Math.random()*700;
+      const attack=0.003+Math.random()*0.005;
+      const decay=0.06+Math.random()*0.08;
+      const peak=0.22+Math.random()*0.25;
+
+      const dSz=Math.floor(rate*0.35);
+      const dBuf=ctx.createBuffer(1,dSz,rate),dd=dBuf.getChannelData(0);
+      for(let i=0;i<dSz;i++)dd[i]=Math.random()*2-1;
+      const dSrc=ctx.createBufferSource(); dSrc.buffer=dBuf;
+      const bpf=ctx.createBiquadFilter(); bpf.type='bandpass'; bpf.frequency.value=freq; bpf.Q.value=2.0;
+      const dg=ctx.createGain();
+      dg.gain.setValueAtTime(0,now);
+      dg.gain.linearRampToValueAtTime(peak,now+attack);
+      dg.gain.setTargetAtTime(0,now+attack,decay);
+      dSrc.connect(bpf);bpf.connect(dg);dg.connect(gainNode);
+      dSrc.start(); dSrc.stop(now+0.35);
+      dropTimer2=setTimeout(scheduleLargeDrop, 200+Math.random()*600);
+    }
+
+    scheduleSmallDrop();
+    scheduleLargeDrop();
+    nodes.push({stop:()=>{
+      if(dropTimer1){clearTimeout(dropTimer1);dropTimer1=null;}
+      if(dropTimer2){clearTimeout(dropTimer2);dropTimer2=null;}
+    }});
+    nodes.push(src1,src2,src3,modSrc,driftSrc,hpf,lpf,lpf2,bpf,hissG,texG,bodyG,pre,delay,delG,modG,driftG);
+  } else if (type==='ocean') {
+    // Brown noise → lowpass 500Hz + very slow LFO (0.07Hz = ~14s wave cycle)
+    const src=ctx.createBufferSource(); src.buffer=buildNoiseBuffer('brown'); src.loop=true;
+    const lpf=ctx.createBiquadFilter(); lpf.type='lowpass'; lpf.frequency.value=500;
+    const lfo=ctx.createOscillator(); lfo.frequency.value=0.07;
+    const lfoG=ctx.createGain(); lfoG.gain.value=0.38;
+    lfo.connect(lfoG); lfoG.connect(gainNode.gain);
+    lfo.start(); src.connect(lpf); lpf.connect(gainNode); src.start();
+    nodes.push(src, lfo, lfoG, lpf);
+  } else if (type==='wind') {
+    // Pink noise → bandpass with sweeping frequency LFO (0.04Hz, ±250Hz around 550Hz)
+    const src=ctx.createBufferSource(); src.buffer=buildNoiseBuffer('pink'); src.loop=true;
+    const bpf=ctx.createBiquadFilter(); bpf.type='bandpass'; bpf.frequency.value=550; bpf.Q.value=1.2;
+    const lfo=ctx.createOscillator(); lfo.frequency.value=0.04;
+    const lfoG=ctx.createGain(); lfoG.gain.value=250;
+    lfo.connect(lfoG); lfoG.connect(bpf.frequency);
+    lfo.start(); src.connect(bpf); bpf.connect(gainNode); src.start();
+    nodes.push(src, lfo, lfoG, bpf);
+  } else if (type==='birds-synth') {
+    // Realistic birds: pitch-sweeping oscillators with vibrato, harmonics, and occasional trills
+
+    function makeChirpNote(startFreq, endFreq, startTime, dur, vel) {
+      if(!noisePlaying) return;
+      const t = startTime;
+
+      // Main oscillator — sweeps pitch like a real bird call
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(startFreq, t);
+      osc.frequency.exponentialRampToValueAtTime(endFreq, t + dur);
+
+      // Vibrato (natural warble)
+      const vib = ctx.createOscillator();
+      vib.frequency.value = 10 + Math.random() * 8;
+      const vibG = ctx.createGain();
+      vibG.gain.value = startFreq * 0.015;
+      vib.connect(vibG); vibG.connect(osc.frequency);
+
+      // Second harmonic for natural timbre
+      const osc2 = ctx.createOscillator();
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(startFreq * 2.01, t);
+      osc2.frequency.exponentialRampToValueAtTime(endFreq * 2.01, t + dur);
+
+      // Smooth envelope: quick attack, short sustain, tapered release
+      const env = ctx.createGain();
+      const env2 = ctx.createGain();
+      [env, env2].forEach((e, i) => {
+        e.gain.setValueAtTime(0, t);
+        e.gain.linearRampToValueAtTime(vel * (i === 0 ? 1.0 : 0.25), t + dur * 0.12);
+        e.gain.setValueAtTime(vel * (i === 0 ? 0.9 : 0.22), t + dur * 0.6);
+        e.gain.linearRampToValueAtTime(0, t + dur);
+      });
+
+      osc.connect(env);   env.connect(gainNode);
+      osc2.connect(env2); env2.connect(gainNode);
+      [osc, osc2, vib].forEach(n => { n.start(t); n.stop(t + dur + 0.02); });
+    }
+
+    function chirp() {
+      if(!noisePlaying) return;
+      const now = ctx.currentTime;
+      const baseFreq = 2000 + Math.random() * 3500;
+      // Pitch sweeps up, down, or arch shape — all common in real birds
+      const sweepType = Math.random();
+      const endFreq = sweepType < 0.4 ? baseFreq * (1.1 + Math.random() * 0.4)   // up
+                    : sweepType < 0.7 ? baseFreq * (0.6 + Math.random() * 0.35)   // down
+                    : baseFreq;                                                    // flat
+      const dur = 0.1 + Math.random() * 0.25;
+      const vel = 0.18 + Math.random() * 0.28;
+
+      makeChirpNote(baseFreq, endFreq, now, dur, vel);
+
+      // ~35% chance of a trill: 3–6 rapid notes immediately after
+      if(Math.random() < 0.35) {
+        const trillCount = 3 + Math.floor(Math.random() * 4);
+        const noteGap = 0.055 + Math.random() * 0.04;
+        for(let i = 0; i < trillCount; i++) {
+          const tStart = now + dur + 0.02 + i * noteGap;
+          const tFreq  = baseFreq * (0.88 + Math.random() * 0.28);
+          const tEnd   = tFreq * (0.9 + Math.random() * 0.2);
+          const tDur   = 0.05 + Math.random() * 0.07;
+          makeChirpNote(tFreq, tEnd, tStart, tDur, vel * 0.75);
+        }
+      }
+
+      // Pause between calls: feels natural and gives space
+      birdsTimer = setTimeout(chirp, 400 + Math.random() * 2000);
+    }
+    chirp();
+  }
+  return nodes;
+}
+
 function startNoise(){
   initAudio();
-  const src=ctx.createBufferSource();src.buffer=buildNoiseBuffer(noiseType);src.loop=true;
-  const filt=ctx.createBiquadFilter();filt.type='bandpass';filt.frequency.value=noiseFreqHz;filt.Q.value=0.8;
   const gain=ctx.createGain();
   gain.gain.setValueAtTime(0,ctx.currentTime);
   gain.gain.linearRampToValueAtTime(noiseVol,ctx.currentTime+NOISE_FADE_IN);
-  src.connect(filt);filt.connect(gain);gain.connect(ctx.destination);
-  src.start();
-  noiseSource=src;noiseFilter=filt;noiseGainNode=gain;
-  noisePlaying=true;setNoise(true);
+  gain.connect(ctx.destination);
+  noiseGainNode=gain;
+
+  noisePlaying=true; setNoise(true);
+  if(isNatureSound(noiseType)){
+    noiseSource=null; noiseFilter=null;
+    noiseExtraNodes=startNatureGraph(noiseType, gain);
+  } else {
+    const src=ctx.createBufferSource(); src.buffer=buildNoiseBuffer(noiseType); src.loop=true;
+    const filt=ctx.createBiquadFilter(); filt.type='bandpass'; filt.frequency.value=noiseFreqHz; filt.Q.value=0.8;
+    src.connect(filt); filt.connect(gain); src.start();
+    noiseSource=src; noiseFilter=filt; noiseExtraNodes=[];
+  }
+  if(document.getElementById('rand-noise-vol').checked) scheduleNoiseRand();
 }
+
 function stopNoise(){
-  if(noiseSource&&noiseGainNode){
-    const src=noiseSource,t=ctx.currentTime;
+  if(noiseGainNode){
+    const t=ctx.currentTime;
     noiseGainNode.gain.setValueAtTime(noiseGainNode.gain.value,t);
     noiseGainNode.gain.linearRampToValueAtTime(0,t+NOISE_FADE_OUT);
-    src.stop(t+NOISE_FADE_OUT+0.05);
   }
-  noiseSource=null;noiseFilter=null;noiseGainNode=null;noisePlaying=false;setNoise(false);
+  if(noiseSource){try{noiseSource.stop(ctx.currentTime+NOISE_FADE_OUT+0.05);}catch(e){}}
+  noiseExtraNodes.forEach(n=>{try{if(n.stop)n.stop(ctx.currentTime+NOISE_FADE_OUT+0.05);}catch(e){}});
+  if(birdsTimer){clearTimeout(birdsTimer);birdsTimer=null;}
+  if(noiseRandTimer){clearTimeout(noiseRandTimer);noiseRandTimer=null;}
+  noiseSource=null; noiseFilter=null; noiseGainNode=null; noiseExtraNodes=[];
+  noisePlaying=false; setNoise(false);
 }
 noiseBtn.addEventListener('click',()=>{if(noisePlaying)stopNoise();else startNoise();});
 document.querySelectorAll('.noise-pill').forEach(btn=>{
@@ -835,6 +1087,9 @@ document.querySelectorAll('.noise-pill').forEach(btn=>{
     noiseType=btn.dataset.noise;
     document.querySelectorAll('.noise-pill').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
+    // Hide frequency slider for nature sounds (it doesn't apply)
+    const freqRow=document.getElementById('noise-freq-row');
+    if(freqRow) freqRow.style.display=isNatureSound(noiseType)?'none':'flex';
     if(noisePlaying){stopNoise();startNoise();}
     saveSettings();
   });
@@ -862,7 +1117,62 @@ noiseFreqSl.addEventListener('input',()=>{
   saveSettings();
 });
 
-// ── Break sliders ──────────────────────────────────────────────────────────
+// ── Noise volume randomisation ─────────────────────────────────────────────
+let noiseRandTimer = null;
+
+// Speed presets: [rampMin, rampMax, holdMin, holdMax] in seconds/ms
+const NOISE_SPEEDS = [
+  { label:'Mild',       rampMin:2.0, rampMax:5.0, holdMin:2000, holdMax:5000 },
+  { label:'Medium',     rampMin:0.8, rampMax:2.5, holdMin:500,  holdMax:2500 },
+  { label:'Aggressive', rampMin:0.15,rampMax:0.6, holdMin:100,  holdMax:700  },
+];
+
+function getNoiseSpeed() {
+  return NOISE_SPEEDS[parseInt(document.getElementById('noise-speed-sl').value)];
+}
+
+function scheduleNoiseRand() {
+  if (noiseRandTimer) { clearTimeout(noiseRandTimer); noiseRandTimer = null; }
+  if (!document.getElementById('rand-noise-vol').checked || !noisePlaying || !noiseGainNode) return;
+  const sp = getNoiseSpeed();
+  const minVol = 0.1;
+  const targetVol = minVol + Math.random() * (noiseVol - minVol);
+  const rampTime = rnd(sp.rampMin, sp.rampMax);
+  noiseGainNode.gain.cancelScheduledValues(ctx.currentTime);
+  noiseGainNode.gain.setValueAtTime(noiseGainNode.gain.value, ctx.currentTime);
+  noiseGainNode.gain.linearRampToValueAtTime(targetVol, ctx.currentTime + rampTime);
+  const holdMs = rnd(sp.holdMin, sp.holdMax);
+  noiseRandTimer = setTimeout(scheduleNoiseRand, (rampTime * 1000) + holdMs);
+}
+
+const noiseSpeedSl = document.getElementById('noise-speed-sl');
+setTrack(noiseSpeedSl, 50, P, T);
+
+function updateSpeedLabels() {
+  const val = parseInt(noiseSpeedSl.value);
+  document.querySelectorAll('.speed-lbl').forEach(lbl => {
+    const active = parseInt(lbl.dataset.val) === val;
+    lbl.style.color  = active ? 'var(--primary)' : 'var(--muted)';
+    lbl.style.fontWeight = active ? '600' : '400';
+  });
+  setTrack(noiseSpeedSl, (val / 2 * 100).toFixed(0), P, T);
+}
+noiseSpeedSl.addEventListener('input', updateSpeedLabels);
+
+document.getElementById('rand-noise-vol').addEventListener('change', e => {
+  noiseSpeedSl.disabled = !e.target.checked;
+  noiseSpeedSl.style.opacity = e.target.checked ? '' : '';
+  if (e.target.checked) {
+    scheduleNoiseRand();
+  } else {
+    if (noiseRandTimer) { clearTimeout(noiseRandTimer); noiseRandTimer = null; }
+    if (noiseGainNode) {
+      noiseGainNode.gain.cancelScheduledValues(ctx.currentTime);
+      noiseGainNode.gain.setValueAtTime(noiseGainNode.gain.value, ctx.currentTime);
+      noiseGainNode.gain.linearRampToValueAtTime(noiseVol, ctx.currentTime + 0.5);
+    }
+  }
+});
 const toneBreakSl=document.getElementById('tone-break-sl');
 setTrack(toneBreakSl,0,P,T);
 toneBreakSl.addEventListener('input',()=>{
