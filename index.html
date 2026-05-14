@@ -2,30 +2,38 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>NeuroTinnus</title>
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-/* ── Theme variables ─────────────────────────────────────────────────────── */
+/* ── Themes ─────────────────────────────────────────────────────────────────*/
 body.theme-a{
-  --bg:#0b0e1a;--card:#111527;--border:#1e2540;
-  --topbar:#111527;--topbar-border:#1e2540;--topbar-text:#e8eaf6;
+  --bg:#0b0e1a;--card:#111527;--border:#1e2240;
+  --topbar:#0e1020;--topbar-border:#1e2240;--topbar-text:#c5cbf0;
   --primary:#7986cb;--primary-dark:#3949ab;
   --btn-bg:#1a1f3a;--btn-hover:#252c4a;
-  --label:#5c6bc0;--text:#e8eaf6;--muted:#3d4a7a;
-  --track:#1e2540;--playing:#1a1f3a;--divider:#1e2540;
-  --freq:#7986cb;--freq-em:#5c6bc0;
-  --dot-done:#3949ab;--status:#7986cb;
+  --label:#5c6bc0;--text:#c5cbf0;--muted:#3d4a8a;
+  --track:#1e2240;--playing:#1a1f3a;--divider:#1e2240;
+  --freq:#7986cb;--freq-em:#5c6bc0;--dot-done:#3949ab;--status:#7986cb;
+  --arc-track:#1e2240;--arc-fill:#5c6bc0;--arc-thumb:#7986cb;
+  --noise-card:#0d1933;--noise-border:#1a3a6a;
+  --tab-bg:#0e1020;--tab-border:#1e2240;--tab-active:#7986cb;--tab-inactive:#2a3366;
+  --onboard:#0d1022;--onboard-border:#2a3060;
+  --section-label:#3d4a8a;
 }
 body.theme-b{
-  --bg:#faf8f5;--card:#fff;--border:#e8e0d4;
-  --topbar:#fff;--topbar-border:#e8e0d4;--topbar-text:#2c1810;
+  --bg:#faf8f5;--card:#fff;--border:#e0d4c4;
+  --topbar:#fff;--topbar-border:#e0d4c4;--topbar-text:#2c1810;
   --primary:#c4914a;--primary-dark:#8b4513;
   --btn-bg:#fdf5ec;--btn-hover:#f5e8d4;
   --label:#c4914a;--text:#2c1810;--muted:#c4a882;
-  --track:#f0e8dc;--playing:#fdf5ec;--divider:#e8e0d4;
-  --freq:#8b4513;--freq-em:#c4a882;
-  --dot-done:#c4a882;--status:#8b4513;
+  --track:#f0e8dc;--playing:#fdf5ec;--divider:#e0d4c4;
+  --freq:#8b4513;--freq-em:#c4a882;--dot-done:#c4a882;--status:#8b4513;
+  --arc-track:#f0e8dc;--arc-fill:#c4914a;--arc-thumb:#8b4513;
+  --noise-card:#fdf5ec;--noise-border:#c4914a;
+  --tab-bg:#fff;--tab-border:#e0d4c4;--tab-active:#8b4513;--tab-inactive:#c4a882;
+  --onboard:#f0ebe3;--onboard-border:#d4c4b0;
+  --section-label:#c4a882;
 }
 body.theme-c{
   --bg:#f2faf8;--card:#fff;--border:#b2ddd6;
@@ -34,451 +42,884 @@ body.theme-c{
   --btn-bg:#e0f5f0;--btn-hover:#b2ddd6;
   --label:#1d8a74;--text:#0d4a3e;--muted:#7ab8b0;
   --track:#d4ede9;--playing:#e0f5f0;--divider:#b2ddd6;
-  --freq:#0d4a3e;--freq-em:#7ab8b0;
-  --dot-done:#7ab8b0;--status:#1d8a74;
+  --freq:#0d4a3e;--freq-em:#7ab8b0;--dot-done:#7ab8b0;--status:#1d8a74;
+  --arc-track:#d4ede9;--arc-fill:#1d8a74;--arc-thumb:#0d4a3e;
+  --noise-card:#e0f5f0;--noise-border:#1d8a74;
+  --tab-bg:#0d4a3e;--tab-border:#1a6b5a;--tab-active:#e0f5f0;--tab-inactive:#3d8a7a;
+  --onboard:#e4f5f2;--onboard-border:#90cdc5;
+  --section-label:#7ab8b0;
 }
-/* ── Base ────────────────────────────────────────────────────────────────── */
+
+/* ── Reset & base ────────────────────────────────────────────────────────── */
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Figtree',sans-serif;background:var(--bg);min-height:100vh;display:flex;flex-direction:column;align-items:center;transition:background 0.25s}
-.topbar{width:100%;background:var(--topbar);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid var(--topbar-border);position:sticky;top:0;z-index:10;transition:background 0.25s,border-color 0.25s}
-.topbar h1{font-size:17px;font-weight:600;color:var(--topbar-text);letter-spacing:-0.2px;transition:color 0.25s}
+body{
+  font-family:'Figtree',sans-serif;background:var(--bg);
+  min-height:100vh;min-height:100dvh;
+  display:flex;flex-direction:column;align-items:center;
+  transition:background 0.25s;
+}
+
+/* ── App shell ───────────────────────────────────────────────────────────── */
+.app-shell{
+  width:100%;max-width:420px;
+  display:flex;flex-direction:column;
+  height:100vh;height:100dvh;
+  position:relative;
+}
+
+/* ── Topbar ──────────────────────────────────────────────────────────────── */
+.topbar{
+  background:var(--topbar);padding:13px 18px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:0.5px solid var(--topbar-border);
+  flex-shrink:0;transition:background 0.25s,border-color 0.25s;
+}
+.topbar h1{font-size:17px;font-weight:600;color:var(--topbar-text);letter-spacing:-0.2px}
 .theme-switcher{display:flex;gap:7px;align-items:center}
-.theme-dot{width:17px;height:17px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;transition:transform 0.12s,box-shadow 0.15s;outline:none;flex-shrink:0}
+.theme-dot{width:16px;height:16px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;transition:transform 0.12s,box-shadow 0.15s;outline:none}
 .theme-dot:hover{transform:scale(1.2)}
-.theme-dot.active{box-shadow:0 0 0 2.5px var(--topbar-text)}
-.content{width:100%;max-width:420px;padding:18px 16px 52px;display:flex;flex-direction:column;gap:13px}
-.section-label{font-size:10px;font-weight:600;color:var(--label);text-transform:uppercase;letter-spacing:0.8px;padding:0 4px;transition:color 0.25s}
-.card{background:var(--card);border-radius:18px;padding:15px 16px;border:0.5px solid var(--border);transition:background 0.25s,border-color 0.25s}
-.freq-display{font-size:22px;font-weight:600;color:var(--freq);text-align:center;margin-bottom:13px;letter-spacing:-0.5px;transition:color 0.25s}
-.freq-display em{font-size:14px;font-weight:400;color:var(--freq-em);font-style:normal;transition:color 0.25s}
-.slider-wrap{display:flex;align-items:center;gap:10px}
+.theme-dot.active{box-shadow:0 0 0 2px var(--topbar-text)}
+
+/* ── Tab content area ────────────────────────────────────────────────────── */
+.tab-content{flex:1;overflow-y:auto;overflow-x:hidden}
+.tab-panel{display:none;padding:16px 16px 20px;flex-direction:column;gap:12px}
+.tab-panel.active{display:flex}
+
+/* ── Bottom tab bar ──────────────────────────────────────────────────────── */
+.bottom-tabs{
+  background:var(--tab-bg);border-top:0.5px solid var(--tab-border);
+  display:flex;flex-shrink:0;transition:background 0.25s,border-color 0.25s;
+}
+.tab-btn{
+  flex:1;padding:9px 0 7px;display:flex;flex-direction:column;
+  align-items:center;gap:3px;border:none;background:transparent;cursor:pointer;
+}
+.tab-btn .t-icon{font-size:20px;color:var(--tab-inactive);transition:color 0.2s}
+.tab-btn .t-lbl{font-size:10px;font-weight:500;color:var(--tab-inactive);letter-spacing:0.3px;transition:color 0.2s}
+.tab-btn .t-pip{width:4px;height:4px;border-radius:50%;background:var(--tab-active);margin-top:1px;opacity:0;transition:opacity 0.2s}
+.tab-btn.active .t-icon{color:var(--tab-active)}
+.tab-btn.active .t-lbl{color:var(--tab-active)}
+.tab-btn.active .t-pip{opacity:1}
+
+/* ── Cards ───────────────────────────────────────────────────────────────── */
+.card{background:var(--card);border-radius:16px;padding:14px 15px;border:0.5px solid var(--border);transition:background 0.25s,border-color 0.25s}
+.card.noise-card{border-width:1.5px;border-color:var(--noise-border);background:var(--noise-card)}
+.section-lbl{font-size:10px;font-weight:600;color:var(--section-label);text-transform:uppercase;letter-spacing:0.8px;padding:0 3px}
+
+/* ── Arc dial ────────────────────────────────────────────────────────────── */
+.arc-card{background:var(--card);border-radius:16px;padding:14px 15px 10px;border:0.5px solid var(--border);text-align:center}
+.arc-hint{font-size:11px;color:var(--muted);margin-bottom:4px}
+.arc-svg-wrap{width:100%;max-width:240px;margin:0 auto;cursor:grab;touch-action:none;user-select:none}
+.arc-svg-wrap:active{cursor:grabbing}
+.arc-freq-display{font-size:26px;font-weight:600;color:var(--freq);letter-spacing:-0.5px;margin:-8px 0 0}
+.arc-freq-display em{font-size:14px;font-weight:400;color:var(--freq-em);font-style:normal}
+.arc-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:8px}
+
+/* ── Vol strip ───────────────────────────────────────────────────────────── */
+.vol-strip{display:flex;align-items:center;gap:10px}
+.vol-lbl{font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;transition:color 0.25s}
+.vol-val{font-size:12px;color:var(--muted);min-width:30px;text-align:right}
 input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:4px;border-radius:2px;outline:none;cursor:pointer;transition:background 0.25s}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--primary);cursor:pointer;transition:background 0.25s}
-input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--primary);cursor:pointer;border:none;transition:background 0.25s}
-.therapy-row{display:flex;align-items:center;gap:10px;padding:8px 4px;border-radius:10px;transition:background 0.2s}
-.therapy-row.playing{background:var(--playing)}
-.therapy-num{font-size:13px;font-weight:500;color:var(--label);width:16px;text-align:center;flex-shrink:0;transition:color 0.25s}
-.therapy-freq{font-size:11px;color:var(--muted);min-width:58px;text-align:right;flex-shrink:0;transition:color 0.25s}
-.divider{height:0.5px;background:var(--divider);margin:0 4px;transition:background 0.25s}
-.vol-row{display:flex;align-items:center;gap:8px}
-.vol-label{font-size:12px;color:var(--text);font-weight:500;white-space:nowrap;transition:color 0.25s}
-.vol-val{font-size:12px;color:var(--muted);min-width:30px;text-align:right;transition:color 0.25s}
-.check-row{display:flex;align-items:center;gap:10px;margin-top:13px;padding-top:11px;border-top:0.5px solid var(--divider)}
-.check-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--primary);cursor:pointer;flex-shrink:0}
-.check-row label{font-size:13px;color:var(--text);font-weight:500;cursor:pointer;user-select:none;transition:color 0.25s}
-.waveform-row{display:flex;align-items:center;gap:8px;margin-top:13px;padding-top:11px;border-top:0.5px solid var(--divider)}
-.waveform-label{font-size:12px;color:var(--text);font-weight:500;white-space:nowrap;transition:color 0.25s}
-.waveform-btns{display:flex;gap:5px;flex-wrap:wrap}
-.wf-btn{padding:4px 10px;border-radius:20px;border:1.5px solid var(--border);background:transparent;font-family:'Figtree',sans-serif;font-size:12px;font-weight:500;color:var(--label);cursor:pointer;transition:all 0.15s}
-.wf-btn:hover{border-color:var(--primary);color:var(--primary)}
-.wf-btn.active{background:var(--primary);border-color:var(--primary);color:#fff}
-.noise-header{display:flex;align-items:center;gap:12px;margin-bottom:13px}
-.noise-type-btns{display:flex;gap:5px}
-.noise-btn{padding:4px 10px;border-radius:20px;border:1.5px solid var(--border);background:transparent;font-family:'Figtree',sans-serif;font-size:12px;font-weight:500;color:var(--label);cursor:pointer;transition:all 0.15s}
-.noise-btn:hover{border-color:var(--primary);color:var(--primary)}
-.noise-btn.active{background:var(--primary);border-color:var(--primary);color:#fff}
-.main-wrap{margin-top:8px;display:flex;flex-direction:column;align-items:center;gap:9px;width:100%}
-.main-label{font-size:12px;color:var(--muted);font-weight:500;transition:color 0.25s}
-.seq-track{display:flex;gap:5px;justify-content:center;min-height:14px;flex-wrap:wrap;max-width:260px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--primary);cursor:pointer}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--primary);cursor:pointer;border:none}
+
+/* ── Play hero ───────────────────────────────────────────────────────────── */
+.play-hero{display:flex;flex-direction:column;align-items:center;gap:8px;padding:6px 0}
+.play-ring-wrap{position:relative;width:88px;height:88px;display:flex;align-items:center;justify-content:center}
+.pulse-ring{position:absolute;inset:0;border-radius:50%;border:1.5px solid var(--primary);opacity:0.3;pointer-events:none}
+@keyframes pulse-ring{0%{transform:scale(1);opacity:0.35}70%{transform:scale(1.18);opacity:0}100%{transform:scale(1.18);opacity:0}}
+.main-btn-pulse .pulse-ring{animation:pulse-ring 1.8s ease-out infinite}
+.play-lbl{font-size:11px;font-weight:500;color:var(--muted);letter-spacing:0.4px}
+
+/* ── Seq dots ────────────────────────────────────────────────────────────── */
+.seq-track{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;min-height:13px;max-width:260px;margin:0 auto}
 .seq-dot{width:13px;height:13px;border-radius:50%;background:var(--track);transition:background 0.12s;flex-shrink:0}
 .seq-dot.done{background:var(--dot-done)}
 .seq-dot.current{background:var(--primary)}
-.status{font-size:11px;color:var(--status);text-align:center;min-height:16px;font-weight:500;transition:color 0.25s}
+.status-line{font-size:11px;color:var(--status);text-align:center;min-height:15px;font-weight:500}
+
+/* ── Noise strip ─────────────────────────────────────────────────────────── */
+.noise-strip{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.noise-types{display:flex;gap:5px;flex:1}
+.noise-vol-mini{display:flex;align-items:center;gap:6px;flex:1;min-width:80px}
+.noise-pill,.wf-btn{padding:4px 10px;border-radius:20px;border:1.5px solid var(--border);background:transparent;font-family:'Figtree',sans-serif;font-size:12px;font-weight:500;color:var(--label);cursor:pointer;transition:all 0.15s}
+.noise-pill:hover,.wf-btn:hover{border-color:var(--primary);color:var(--primary)}
+.noise-pill.active,.wf-btn.active{background:var(--primary);border-color:var(--primary);color:#fff}
+
+/* ── Tone/settings panels ────────────────────────────────────────────────── */
+.therapy-row{display:flex;align-items:center;gap:8px;padding:7px 3px;border-radius:10px;transition:background 0.2s}
+.therapy-row.playing{background:var(--playing)}
+.therapy-num{font-size:12px;font-weight:500;color:var(--label);width:14px;text-align:center;flex-shrink:0}
+.therapy-freq{font-size:10px;color:var(--muted);min-width:80px;text-align:right;flex-shrink:0}
+.divider{height:0.5px;background:var(--divider);margin:0 3px}
+.check-row{display:flex;align-items:center;gap:10px;margin-top:11px;padding-top:10px;border-top:0.5px solid var(--divider)}
+.check-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--primary);cursor:pointer;flex-shrink:0}
+.check-row label{font-size:13px;color:var(--text);font-weight:500;cursor:pointer;user-select:none}
+.waveform-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.waveform-lbl{font-size:12px;color:var(--text);font-weight:500;white-space:nowrap}
+.waveform-btns{display:flex;gap:5px;flex-wrap:wrap}
+.vol-row{display:flex;align-items:center;gap:8px}
+.vol-val2{font-size:12px;color:var(--muted);min-width:30px;text-align:right}
+
+/* ── Pulsing main button ─────────────────────────────────────────────────── */
+@keyframes pulse-ring{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--primary) 55%,transparent)}70%{box-shadow:0 0 0 10px color-mix(in srgb,var(--primary) 0%,transparent)}100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--primary) 0%,transparent)}}
+.main-btn-pulse{animation:pulse-ring 1.8s ease-out infinite}
+
+/* ── Onboarding ──────────────────────────────────────────────────────────── */
+#onboard{position:fixed;inset:0;background:rgba(0,0,0,0.88);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:100;display:flex;align-items:center;justify-content:center;padding:24px}
+#onboard.hidden{display:none}
+.ob-card{background:var(--onboard);border:1px solid var(--onboard-border);border-radius:22px;padding:28px 24px;max-width:360px;width:100%;display:flex;flex-direction:column;gap:16px;box-shadow:0 32px 80px rgba(0,0,0,0.6)}
+.ob-title{font-size:20px;font-weight:600;color:var(--freq);letter-spacing:-0.3px}
+.ob-sub{font-size:13px;color:var(--muted);line-height:1.55}
+.ob-freq{font-size:28px;font-weight:600;color:var(--freq);text-align:center;letter-spacing:-0.5px}
+.ob-freq em{font-size:16px;font-weight:400;color:var(--freq-em);font-style:normal}
+.ob-hint{font-size:11px;color:var(--muted);text-align:center}
+.ob-actions{display:flex;flex-direction:column;gap:8px;margin-top:4px}
 </style>
 </head>
-<body class="theme-c">
+<body class="theme-a">
 
-<div class="topbar">
-  <h1>NeuroTinnus</h1>
-  <div class="theme-switcher" aria-label="Choose colour theme">
-    <button class="theme-dot" data-theme="theme-a" style="background:#7986cb" aria-label="Deep space theme" title="Deep space"></button>
-    <button class="theme-dot" data-theme="theme-b" style="background:#c4914a" aria-label="Warm clinical theme" title="Warm clinical"></button>
-    <button class="theme-dot active" data-theme="theme-c" style="background:#1d8a74" aria-label="High contrast teal theme" title="High contrast teal"></button>
+<!-- ── Onboarding ────────────────────────────────────────────────────────── -->
+<div id="onboard">
+  <div class="ob-card">
+    <div class="ob-title">Welcome to NeuroTinnus</div>
+    <div class="ob-sub">Let's find your tinnitus frequency. Adjust the slider until the tone matches the ringing in your ear, then press <strong>Continue</strong>.</div>
+    <div class="ob-freq" id="ob-freq-display">2660&nbsp;<em>Hz</em></div>
+    <div class="vol-strip">
+      <input type="range" id="ob-slider" min="100" max="12000" step="10" value="2660">
+      <div id="ob-play-wrap"></div>
+    </div>
+    <div class="ob-hint">Use the ▶ button to hear the tone while you adjust</div>
+    <div class="ob-actions">
+      <div id="ob-confirm-wrap"></div>
+      <button id="ob-skip" style="background:transparent;border:none;font-family:'Figtree',sans-serif;font-size:12px;color:var(--muted);cursor:pointer;text-align:center;padding:4px">Skip — I'll set it manually</button>
+    </div>
   </div>
 </div>
 
-<div class="content">
+<!-- ── App ───────────────────────────────────────────────────────────────── -->
+<div class="app-shell">
 
-  <div class="card">
-    <div class="vol-row">
-      <span class="vol-label">Therapy sounds volume</span>
-      <div class="slider-wrap" style="flex:1">
-        <input type="range" id="master-vol" min="0" max="100" step="1" value="80">
-      </div>
-      <span class="vol-val" id="mvlbl">80%</span>
+  <!-- Topbar -->
+  <div class="topbar">
+    <h1>NeuroTinnus</h1>
+    <div class="theme-switcher">
+      <button class="theme-dot active" data-theme="theme-a" style="background:#7986cb" title="Deep space"></button>
+      <button class="theme-dot"        data-theme="theme-b" style="background:#c4914a" title="Warm clinical"></button>
+      <button class="theme-dot"        data-theme="theme-c" style="background:#1d8a74" title="High contrast teal"></button>
     </div>
   </div>
 
-  <div class="section-label">My Tinnitus Settings</div>
-  <div class="card">
-    <div class="freq-display" id="freq-display">2660&nbsp;<em>Hz</em></div>
-    <div class="slider-wrap">
-      <input type="range" id="tinnitus-slider" min="100" max="12000" step="10" value="2660">
-      <div id="prev-wrap"></div>
-    </div>
+  <!-- Tab content -->
+  <div class="tab-content">
+
+    <!-- ── SESSION tab ───────────────────────────────────────────────────── -->
+    <div class="tab-panel active" id="panel-session">
+
+      <!-- Arc dial -->
+      <div class="arc-card">
+        <div class="arc-hint">What does your tinnitus frequency sound like?</div>
+        <div class="arc-svg-wrap" id="arc-wrap" aria-label="Tinnitus frequency dial">
+          <svg id="arc-svg" viewBox="0 0 220 95" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;overflow:visible">
+            <!-- Background arc -->
+            <path id="arc-bg"   fill="none" stroke-width="6" stroke-linecap="round"/>
+            <!-- Progress arc -->
+            <path id="arc-prog" fill="none" stroke-width="6" stroke-linecap="round"/>
+            <!-- Thumb -->
+            <circle id="arc-thumb" r="9" stroke-width="3"/>
+            <!-- Labels -->
+            <text id="arc-lbl-min" text-anchor="start"  font-size="10" font-family="Figtree,sans-serif">100 Hz</text>
+            <text id="arc-lbl-max" text-anchor="end"    font-size="10" font-family="Figtree,sans-serif">12 kHz</text>
+          </svg>
+        </div>
+        <div class="arc-freq-display" id="freq-display">2660&nbsp;<em>Hz</em></div>
+        <!-- Hidden range input keeps the value; arc drag updates it -->
+        <input type="range" id="tinnitus-slider" min="100" max="12000" step="10" value="2660" style="display:none">
+        <div class="arc-row">
+          <span style="font-size:11px;color:var(--muted)">Preview your tone</span>
+          <div id="prev-wrap"></div>
+        </div>
+      </div>
+
+      <!-- Therapy vol -->
+      <div class="card">
+        <div class="vol-strip">
+          <span class="vol-lbl">Therapy volume</span>
+          <input type="range" id="master-vol" min="0" max="100" step="1" value="20">
+          <span class="vol-val" id="mvlbl">20%</span>
+        </div>
+      </div>
+
+      <!-- Play hero -->
+      <div class="play-hero">
+        <div class="play-ring-wrap" id="main-ring-wrap">
+          <div class="pulse-ring"></div>
+          <div id="main-wrap-btn"></div>
+        </div>
+        <div class="play-lbl" id="main-label">PLAY THERAPY</div>
+      </div>
+
+      <!-- Sequence progress -->
+      <div class="seq-track" id="seq-track"></div>
+      <div class="status-line" id="status"></div>
+
+      <!-- Noise strip -->
+      <div class="section-lbl">Background Noise</div>
+      <div class="card noise-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div id="noise-btn-wrap"></div>
+          <div class="noise-types" style="flex-wrap:wrap;gap:5px">
+            <button class="noise-pill active" data-noise="white">White</button>
+            <button class="noise-pill" data-noise="pink">Pink</button>
+            <button class="noise-pill" data-noise="brown">Brown</button>
+            <button class="noise-pill" data-noise="blue">Blue</button>
+            <button class="noise-pill" data-noise="violet">Violet</button>
+            <button class="noise-pill" data-noise="grey">Grey</button>
+          </div>
+        </div>
+        <div class="vol-strip" style="margin-bottom:8px">
+          <span class="vol-lbl" style="font-size:13px">Volume</span>
+          <input type="range" id="noise-vol" min="0" max="100" step="1" value="50">
+          <span class="vol-val" id="noise-vol-lbl">50%</span>
+        </div>
+        <div class="vol-strip">
+          <span class="vol-lbl" style="font-size:13px">Frequency</span>
+          <input type="range" id="noise-freq-sl" min="100" max="12000" step="10" value="1000">
+          <span class="vol-val" id="noise-freq-lbl">1 kHz</span>
+        </div>
+      </div>
+
+    </div><!-- /panel-session -->
+
+    <!-- ── TONES tab ──────────────────────────────────────────────────────── -->
+    <div class="tab-panel" id="panel-tones">
+
+      <div class="section-lbl">Waveform</div>
+      <div class="card">
+        <div class="waveform-row">
+          <span class="waveform-lbl">Type</span>
+          <div class="waveform-btns">
+            <button class="wf-btn active" data-wave="sine">Sine</button>
+            <button class="wf-btn" data-wave="triangle">Triangle</button>
+            <button class="wf-btn" data-wave="sawtooth">Sawtooth</button>
+            <button class="wf-btn" data-wave="square">Square</button>
+          </div>
+        </div>
+        <div class="check-row">
+          <input type="checkbox" id="rand-wave">
+          <label for="rand-wave">Randomize waveform per sequence</label>
+        </div>
+      </div>
+
+      <div class="section-lbl">Timing</div>
+      <div class="card">
+        <div class="vol-strip">
+          <span class="vol-lbl">Break between tones</span>
+          <input type="range" id="tone-break-sl" min="0" max="500" step="10" value="0">
+          <span class="vol-val" id="tone-break-lbl">0 ms</span>
+        </div>
+        <div class="vol-strip" style="margin-top:10px">
+          <span class="vol-lbl">Break after sequence</span>
+          <input type="range" id="seq-break-sl" min="0" max="5000" step="100" value="1000">
+          <span class="vol-val" id="seq-break-lbl">1 s</span>
+        </div>
+        <div class="check-row">
+          <input type="checkbox" id="rand-seq-break">
+          <label for="rand-seq-break">Random break after sequence (0 – 5 s)</label>
+        </div>
+      </div>
+
+    </div><!-- /panel-tones -->
+
+    <!-- ── SETTINGS tab ───────────────────────────────────────────────────── -->
+    <div class="tab-panel" id="panel-settings">
+
+      <div class="section-lbl">Therapy Tones Volume</div>
+      <div class="card">
+        <div id="therapy-rows"></div>
+        <div class="check-row">
+          <input type="checkbox" id="rand-vol">
+          <label for="rand-vol">Randomize volume</label>
+        </div>
+      </div>
+
+    </div><!-- /panel-settings -->
+
+  </div><!-- /tab-content -->
+
+  <!-- Bottom tab bar -->
+  <div class="bottom-tabs">
+    <button class="tab-btn active" data-panel="panel-session">
+      <span class="t-icon">◎</span>
+      <div class="t-pip"></div>
+      <span class="t-lbl">Session</span>
+    </button>
+    <button class="tab-btn" data-panel="panel-tones">
+      <span class="t-icon">♪</span>
+      <div class="t-pip"></div>
+      <span class="t-lbl">Tones</span>
+    </button>
+    <button class="tab-btn" data-panel="panel-settings">
+      <span class="t-icon">⚙</span>
+      <div class="t-pip"></div>
+      <span class="t-lbl">Settings</span>
+    </button>
   </div>
 
-  <div class="section-label">Therapy Tones Volume</div>
-  <div class="card">
-    <div id="therapy-rows"></div>
-    <div class="check-row">
-      <input type="checkbox" id="rand-vol">
-      <label for="rand-vol">Randomize volume</label>
-    </div>
-    <div class="waveform-row">
-      <span class="waveform-label">Waveform</span>
-      <div class="waveform-btns">
-        <button class="wf-btn active" data-wave="sine">Sine</button>
-        <button class="wf-btn" data-wave="triangle">Triangle</button>
-        <button class="wf-btn" data-wave="sawtooth">Sawtooth</button>
-        <button class="wf-btn" data-wave="square">Square</button>
-      </div>
-    </div>
-    <div class="check-row" style="margin-top:9px;padding-top:9px">
-      <input type="checkbox" id="rand-wave">
-      <label for="rand-wave">Randomize waveform</label>
-    </div>
-  </div>
-
-  <div class="main-wrap">
-    <div id="main-wrap-btn"></div>
-    <div class="main-label" id="main-label">Play Therapy</div>
-    <div class="seq-track" id="seq-track"></div>
-    <div class="status" id="status"></div>
-  </div>
-
-  <div class="section-label">Background Noise</div>
-  <div class="card">
-    <div class="noise-header">
-      <div id="noise-btn-wrap"></div>
-      <div class="noise-type-btns">
-        <button class="noise-btn active" data-noise="white">White</button>
-        <button class="noise-btn" data-noise="pink">Pink</button>
-        <button class="noise-btn" data-noise="brown">Brown</button>
-      </div>
-    </div>
-    <div class="vol-row">
-      <span class="vol-label">Volume</span>
-      <div class="slider-wrap" style="flex:1">
-        <input type="range" id="noise-vol" min="0" max="100" step="1" value="50">
-      </div>
-      <span class="vol-val" id="noise-vol-lbl">50%</span>
-    </div>
-    <div class="vol-row" style="margin-top:10px">
-      <span class="vol-label">Frequency</span>
-      <div class="slider-wrap" style="flex:1">
-        <input type="range" id="noise-freq-sl" min="100" max="12000" step="10" value="1000">
-      </div>
-      <span class="vol-val" id="noise-freq-lbl">1 kHz</span>
-    </div>
-  </div>
-
-</div>
+</div><!-- /app-shell -->
 
 <script>
+// ── localStorage ───────────────────────────────────────────────────────────
+const LS_KEY='neurotinnus_v1';
+function saveSettings(){
+  localStorage.setItem(LS_KEY,JSON.stringify({
+    tinnitusHz,masterVol,noiseVol,noiseFreqHz,noiseType,currentWaveform,
+    volValues:[...volValues],
+    randVol:document.getElementById('rand-vol').checked,
+    randWave:document.getElementById('rand-wave').checked,
+    theme:document.body.className,
+  }));
+}
+function loadSettings(){try{return JSON.parse(localStorage.getItem(LS_KEY))||{};}catch(e){return {};}}
+const saved=loadSettings();
+const isFirstVisit=!localStorage.getItem(LS_KEY);
+
 // ── Button factory ─────────────────────────────────────────────────────────
-function mkBtn(sz, br) {
-  const b = document.createElement('button');
-  b.style.cssText = `width:${sz}px;height:${sz}px;min-width:${sz}px;border-radius:${br}px;` +
-    `border:2.5px solid var(--primary);background:var(--btn-bg);` +
+function mkBtn(sz,br){
+  const b=document.createElement('button');
+  b.style.cssText=`width:${sz}px;height:${sz}px;min-width:${sz}px;border-radius:${br}px;`+
+    `border:2.5px solid var(--primary);background:var(--btn-bg);`+
     `display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex-shrink:0;transition:background 0.15s`;
-  const ic = Math.round(sz * 0.44);
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('viewBox', '0 0 32 32');
-  svg.style.cssText = `width:${ic}px;height:${ic}px;display:block;color:var(--primary);transition:color 0.15s`;
+  const ic=Math.round(sz*0.44);
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('viewBox','0 0 32 32');
+  svg.style.cssText=`width:${ic}px;height:${ic}px;display:block;color:var(--primary);transition:color 0.15s`;
   b.appendChild(svg);
-  let on = false;
-  function activate(v) {
-    on = v;
-    b.style.background = v ? 'var(--primary)' : 'var(--btn-bg)';
-    svg.style.color     = v ? '#fff' : 'var(--primary)';
-    svg.innerHTML = v
-      ? '<rect x="6" y="5" width="7" height="22" fill="currentColor"/><rect x="19" y="5" width="7" height="22" fill="currentColor"/>'
-      : '<polygon points="9,6 25,16 9,26" fill="currentColor"/>';
+  let on=false;
+  function activate(v){
+    on=v;
+    b.style.background=v?'var(--primary)':'var(--btn-bg)';
+    svg.style.color=v?'#fff':'var(--primary)';
+    svg.innerHTML=v
+      ?'<rect x="6" y="5" width="7" height="22" fill="currentColor"/><rect x="19" y="5" width="7" height="22" fill="currentColor"/>'
+      :'<polygon points="9,6 25,16 9,26" fill="currentColor"/>';
   }
   activate(false);
-  b.addEventListener('mouseover', () => { if (!on) b.style.background = 'var(--btn-hover)'; });
-  b.addEventListener('mouseout',  () => { if (!on) b.style.background = 'var(--btn-bg)'; });
-  return { b, activate };
+  b.addEventListener('mouseover',()=>{if(!on)b.style.background='var(--btn-hover)';});
+  b.addEventListener('mouseout', ()=>{if(!on)b.style.background='var(--btn-bg)';});
+  return {b,activate};
+}
+function mkConfirmBtn(label){
+  const b=document.createElement('button');
+  b.textContent=label;
+  b.style.cssText=`width:100%;padding:12px;border-radius:12px;border:none;`+
+    `background:var(--primary);color:#fff;font-family:'Figtree',sans-serif;`+
+    `font-size:14px;font-weight:600;cursor:pointer;transition:opacity 0.15s`;
+  b.addEventListener('mouseover',()=>b.style.opacity='0.85');
+  b.addEventListener('mouseout', ()=>b.style.opacity='1');
+  return b;
 }
 
-const { b: prevBtn,  activate: setPrev  } = mkBtn(36, 50);
-const { b: mainBtn,  activate: setMain  } = mkBtn(72, 20);
-const { b: noiseBtn, activate: setNoise } = mkBtn(36, 50);
+const {b:prevBtn,  activate:setPrev  }=mkBtn(36,50);
+const {b:mainBtn,  activate:setMain  }=mkBtn(72,20);
+const {b:noiseBtn, activate:setNoise }=mkBtn(36,50);
+const {b:obPlayBtn,activate:setObPlay}=mkBtn(36,50);
+const obConfirmBtn=mkConfirmBtn('Continue →');
+
 document.getElementById('prev-wrap').appendChild(prevBtn);
 document.getElementById('main-wrap-btn').appendChild(mainBtn);
 document.getElementById('noise-btn-wrap').appendChild(noiseBtn);
+document.getElementById('ob-play-wrap').appendChild(obPlayBtn);
+document.getElementById('ob-confirm-wrap').appendChild(obConfirmBtn);
 
-// ── Theme switcher ─────────────────────────────────────────────────────────
-document.querySelectorAll('.theme-dot').forEach(dot => {
-  dot.addEventListener('click', () => {
-    document.body.className = dot.dataset.theme;
-    document.querySelectorAll('.theme-dot').forEach(d => d.classList.remove('active'));
-    dot.classList.add('active');
+// ── Theme ──────────────────────────────────────────────────────────────────
+function applyTheme(t){
+  document.body.className=t;
+  document.querySelectorAll('.theme-dot').forEach(d=>d.classList.toggle('active',d.dataset.theme===t));
+}
+applyTheme(saved.theme||'theme-a');
+document.querySelectorAll('.theme-dot').forEach(dot=>{
+  dot.addEventListener('click',()=>{applyTheme(dot.dataset.theme);drawArc();saveSettings();});
+});
+
+// ── Tab navigation ─────────────────────────────────────────────────────────
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.panel).classList.add('active');
   });
 });
 
 // ── Audio ──────────────────────────────────────────────────────────────────
-const AC = window.AudioContext || window.webkitAudioContext;
-let ctx = null, masterGainNode = null, masterVol = 0.8;
-let currentWaveform = 'sine', seqWaveform = 'sine';
+const AC=window.AudioContext||window.webkitAudioContext;
+let ctx=null,masterGainNode=null;
+let masterVol=saved.masterVol!==undefined?saved.masterVol:0.2;
+let currentWaveform=saved.currentWaveform||'sine';
+let seqWaveform=currentWaveform;
 
-function initAudio() {
-  if (!ctx) ctx = new AC();
-  if (ctx.state === 'suspended') ctx.resume();
-  if (!masterGainNode) {
-    masterGainNode = ctx.createGain();
-    masterGainNode.gain.value = masterVol;
+function initAudio(){
+  if(!ctx)ctx=new AC();
+  if(ctx.state==='suspended')ctx.resume();
+  if(!masterGainNode){
+    masterGainNode=ctx.createGain();
+    masterGainNode.gain.value=masterVol;
     masterGainNode.connect(ctx.destination);
   }
 }
 
 // ── App state ──────────────────────────────────────────────────────────────
-let tinnitusHz = 2660;
-let volValues = [0.65, 0.65, 0.35, 0.35];
-let previewPlaying = false, previewOsc = null;
-let therapyPlaying = false, therapyTimer = null;
-let currentSeq = [], seqLen = 10, seqPos = 0;
-let currentOsc = null, currentOscGain = null;
+let tinnitusHz=saved.tinnitusHz||2660;
+let volValues=saved.volValues||[0.65,0.65,0.35,0.35];
+let previewPlaying=false,previewOsc=null;
+let therapyPlaying=false,therapyTimer=null;
+let currentSeq=[],seqLen=10,seqPos=0;
+let currentOsc=null,currentOscGain=null;
 
-const TONE_DUR = 300;
-const OFFSETS  = [-1000, -430, 850, 1670];
-const OFF_L    = ['−1000 Hz', '−430 Hz', '+850 Hz', '+1670 Hz'];
+const FADE=0.12;
+const TONE_DUR=300;
+let toneBetweakBreakMs=0;
+let seqBreakMs=1000;
+const OFFSETS=[-1000,-430,850,1670];
+const OFF_L=['−1000 Hz from tinnitus','−430 Hz from tinnitus','+850 Hz from tinnitus','+1670 Hz from tinnitus'];
 
-function rnd(a, b)    { return Math.random() * (b - a) + a; }
-function rndInt(a, b) { return Math.floor(rnd(a, b + 1)); }
-function randSeqLen() { return rndInt(4, 15); }
-function randPause()  { return rnd(700, 1500); }
-function randSeq(len, last) {
-  const s = []; let p = (last !== undefined) ? last : -1;
-  for (let i = 0; i < len; i++) { let n; do { n = rndInt(0, 3); } while (n === p); s.push(n); p = n; }
+function rnd(a,b){return Math.random()*(b-a)+a;}
+function rndInt(a,b){return Math.floor(rnd(a,b+1));}
+function randSeqLen(){return rndInt(4,15);}
+function randSeq(len,last){
+  const s=[];let p=last!==undefined?last:-1;
+  for(let i=0;i<len;i++){let n;do{n=rndInt(0,3);}while(n===p);s.push(n);p=n;}
   return s;
 }
-function fmtHz(hz) {
-  return hz >= 1000 ? (hz / 1000).toFixed(2).replace(/\.?0+$/, '') + ' kHz' : Math.round(hz) + ' Hz';
-}
-function tFreqs() { return OFFSETS.map(o => Math.max(20, Math.min(20000, tinnitusHz + o))); }
+function fmtHz(hz){return hz>=1000?(hz/1000).toFixed(2).replace(/\.?0+$/,'')+' kHz':Math.round(hz)+' Hz';}
+function tFreqs(){return OFFSETS.map(o=>Math.max(20,Math.min(20000,tinnitusHz+o)));}
+function setTrack(el,pct,col,bg){el.style.background=`linear-gradient(to right,${col} ${pct}%,${bg} ${pct}%)`;}
+const P='var(--primary)',T='var(--track)';
 
-function setTrack(el, pct, col, bg) {
-  el.style.background = `linear-gradient(to right, ${col} ${pct}%, ${bg} ${pct}%)`;
+// ── Arc dial ───────────────────────────────────────────────────────────────
+const ARC_CX=110, ARC_CY=110, ARC_R=82;
+const ARC_START=215, ARC_END=325; // degrees, clockwise in SVG
+
+function deg2rad(d){return d*Math.PI/180;}
+function arcPoint(deg){
+  return {
+    x:(ARC_CX+ARC_R*Math.cos(deg2rad(deg))).toFixed(2),
+    y:(ARC_CY+ARC_R*Math.sin(deg2rad(deg))).toFixed(2)
+  };
 }
-const P = 'var(--primary)', T = 'var(--track)'; // shorthand for track calls
+function arcPath(fromDeg,toDeg){
+  const s=arcPoint(fromDeg),e=arcPoint(toDeg);
+  const diff=toDeg-fromDeg;
+  const large=diff>180?1:0;
+  return `M ${s.x} ${s.y} A ${ARC_R} ${ARC_R} 0 ${large} 1 ${e.x} ${e.y}`;
+}
+function hzToAngle(hz){
+  const pct=(hz-100)/(12000-100);
+  return ARC_START+pct*(ARC_END-ARC_START);
+}
+function angleToHz(deg){
+  const pct=(deg-ARC_START)/(ARC_END-ARC_START);
+  return Math.round(100+pct*(12000-100)/10)*10;
+}
+
+const arcBg=document.getElementById('arc-bg');
+const arcProg=document.getElementById('arc-prog');
+const arcThumb=document.getElementById('arc-thumb');
+const arcLblMin=document.getElementById('arc-lbl-min');
+const arcLblMax=document.getElementById('arc-lbl-max');
+const arcSvg=document.getElementById('arc-svg');
+
+function drawArc(){
+  const styles=getComputedStyle(document.body);
+  const trackCol=styles.getPropertyValue('--arc-track').trim();
+  const fillCol =styles.getPropertyValue('--arc-fill').trim();
+  const thumbCol=styles.getPropertyValue('--arc-thumb').trim();
+  const mutedCol=styles.getPropertyValue('--muted').trim();
+
+  const fullPath=arcPath(ARC_START,ARC_END);
+  arcBg.setAttribute('d',fullPath);
+  arcBg.setAttribute('stroke',trackCol);
+
+  const angle=hzToAngle(tinnitusHz);
+  const progPath=arcPath(ARC_START,angle);
+  arcProg.setAttribute('d',progPath);
+  arcProg.setAttribute('stroke',fillCol);
+
+  const tp=arcPoint(angle);
+  arcThumb.setAttribute('cx',tp.x);
+  arcThumb.setAttribute('cy',tp.y);
+  arcThumb.setAttribute('fill',thumbCol);
+  arcThumb.setAttribute('stroke',trackCol);
+
+  // Min/max labels at arc endpoints
+  const minPt=arcPoint(ARC_START);
+  const maxPt=arcPoint(ARC_END);
+  arcLblMin.setAttribute('x',(parseFloat(minPt.x)-2).toFixed(1));
+  arcLblMin.setAttribute('y',(parseFloat(minPt.y)+14).toFixed(1));
+  arcLblMin.setAttribute('fill',mutedCol);
+  arcLblMax.setAttribute('x',(parseFloat(maxPt.x)+2).toFixed(1));
+  arcLblMax.setAttribute('y',(parseFloat(maxPt.y)+14).toFixed(1));
+  arcLblMax.setAttribute('fill',mutedCol);
+}
+
+const fDisp=document.getElementById('freq-display');
+function updFreqDisplay(){
+  const f=tinnitusHz;
+  fDisp.innerHTML=f>=1000?(f/1000).toFixed(2).replace(/\.?0+$/,'')+'&nbsp;<em>kHz</em>':f+'&nbsp;<em>Hz</em>';
+  tFreqs().forEach((freq,i)=>{const el=document.getElementById('tl'+i);if(el)el.textContent=fmtHz(freq);});
+}
+drawArc();
+updFreqDisplay();
+
+// Arc drag
+let arcDragging=false;
+function pointerToAngle(e){
+  const rect=arcSvg.getBoundingClientRect();
+  const clientX=e.touches?e.touches[0].clientX:e.clientX;
+  const clientY=e.touches?e.touches[0].clientY:e.clientY;
+  const svgX=(clientX-rect.left)/rect.width*220;
+  const svgY=(clientY-rect.top)/rect.height*130;
+  const dx=svgX-ARC_CX, dy=svgY-ARC_CY;
+  let angle=Math.atan2(dy,dx)*180/Math.PI;
+  if(angle<0)angle+=360;
+  // Clamp to arc range [ARC_START, ARC_END]
+  if(angle<ARC_START){
+    // In the gap region — snap to nearest endpoint
+    const dStart=ARC_START-angle;
+    const dEnd=360-ARC_END+angle;
+    angle=dStart<dEnd?ARC_START:ARC_END;
+  }
+  return Math.max(ARC_START,Math.min(ARC_END,angle));
+}
+function applyArcAngle(angle){
+  tinnitusHz=Math.max(100,Math.min(12000,angleToHz(angle)));
+  const tSl=document.getElementById('tinnitus-slider');
+  tSl.value=tinnitusHz;
+  drawArc();updFreqDisplay();
+  if(previewPlaying&&previewOsc)previewOsc.frequency.setTargetAtTime(tinnitusHz,ctx.currentTime,0.03);
+  saveSettings();
+}
+const arcWrap=document.getElementById('arc-wrap');
+arcWrap.addEventListener('mousedown',e=>{arcDragging=true;applyArcAngle(pointerToAngle(e));});
+arcWrap.addEventListener('touchstart',e=>{e.preventDefault();arcDragging=true;applyArcAngle(pointerToAngle(e));},{passive:false});
+window.addEventListener('mousemove',e=>{if(arcDragging)applyArcAngle(pointerToAngle(e));});
+window.addEventListener('touchmove',e=>{if(arcDragging){e.preventDefault();applyArcAngle(pointerToAngle(e));}},{passive:false});
+window.addEventListener('mouseup',()=>arcDragging=false);
+window.addEventListener('touchend',()=>arcDragging=false);
+
+// Hidden range input (kept for compatibility with save/load)
+const tSl=document.getElementById('tinnitus-slider');
+tSl.addEventListener('input',()=>{tinnitusHz=parseInt(tSl.value);drawArc();updFreqDisplay();saveSettings();});
 
 // ── Master volume ──────────────────────────────────────────────────────────
-const mvSl = document.getElementById('master-vol');
-setTrack(mvSl, 80, P, T);
-mvSl.addEventListener('input', () => {
-  masterVol = mvSl.value / 100;
-  document.getElementById('mvlbl').textContent = mvSl.value + '%';
-  setTrack(mvSl, mvSl.value, P, T);
-  if (masterGainNode) masterGainNode.gain.setTargetAtTime(masterVol, ctx.currentTime, 0.015);
-});
-
-// ── Tinnitus slider ────────────────────────────────────────────────────────
-const tSl   = document.getElementById('tinnitus-slider');
-const fDisp = document.getElementById('freq-display');
-function updFreq() {
-  const f = tinnitusHz;
-  fDisp.innerHTML = f >= 1000
-    ? (f / 1000).toFixed(2).replace(/\.?0+$/, '') + '&nbsp;<em>kHz</em>'
-    : f + '&nbsp;<em>Hz</em>';
-  setTrack(tSl, ((f - 100) / (12000 - 100) * 100).toFixed(2), P, T);
-  tFreqs().forEach((freq, i) => { const el = document.getElementById('tl' + i); if (el) el.textContent = fmtHz(freq); });
-}
-updFreq();
-tSl.addEventListener('input', () => {
-  tinnitusHz = parseInt(tSl.value); updFreq();
-  if (previewPlaying && previewOsc) previewOsc.frequency.setTargetAtTime(tinnitusHz, ctx.currentTime, 0.03);
+const mvSl=document.getElementById('master-vol');
+mvSl.value=Math.round(masterVol*100);
+setTrack(mvSl,mvSl.value,P,T);
+document.getElementById('mvlbl').textContent=mvSl.value+'%';
+mvSl.addEventListener('input',()=>{
+  masterVol=mvSl.value/100;
+  document.getElementById('mvlbl').textContent=mvSl.value+'%';
+  setTrack(mvSl,mvSl.value,P,T);
+  if(masterGainNode)masterGainNode.gain.setTargetAtTime(masterVol,ctx.currentTime,0.015);
+  saveSettings();
 });
 
 // ── Waveform selector ──────────────────────────────────────────────────────
-document.querySelectorAll('.wf-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    currentWaveform = btn.dataset.wave;
-    document.querySelectorAll('.wf-btn').forEach(b => b.classList.remove('active'));
+document.querySelectorAll('.wf-btn').forEach(btn=>{
+  if(btn.dataset.wave===currentWaveform)btn.classList.add('active');
+  else btn.classList.remove('active');
+  btn.addEventListener('click',()=>{
+    currentWaveform=btn.dataset.wave;
+    document.querySelectorAll('.wf-btn').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
-    if (previewPlaying && previewOsc) previewOsc.type = currentWaveform;
+    if(previewPlaying&&previewOsc)previewOsc.type=currentWaveform;
+    saveSettings();
   });
 });
 
 // ── Therapy rows ───────────────────────────────────────────────────────────
-const rowsEl = document.getElementById('therapy-rows');
-const rowEls = [];
-OFF_L.forEach((lbl, i) => {
-  if (i > 0) { const d = document.createElement('div'); d.className = 'divider'; rowsEl.appendChild(d); }
-  const row = document.createElement('div'); row.className = 'therapy-row';
-  row.innerHTML = `<span class="therapy-num">${i+1}</span><input type="range" min="0" max="100" step="1" value="${Math.round(volValues[i]*100)}" style="flex:1"><span class="therapy-freq" id="tl${i}"></span>`;
+const rowsEl=document.getElementById('therapy-rows');
+const rowEls=[];
+OFF_L.forEach((lbl,i)=>{
+  if(i>0){const d=document.createElement('div');d.className='divider';rowsEl.appendChild(d);}
+  const row=document.createElement('div');row.className='therapy-row';
+  row.innerHTML=`<span class="therapy-num">${i+1}</span><input type="range" min="0" max="100" step="1" value="${Math.round(volValues[i]*100)}" style="flex:1"><span class="therapy-freq" id="tl${i}"></span>`;
   rowsEl.appendChild(row);
-  const vsl = row.querySelector('input');
-  setTrack(vsl, Math.round(volValues[i]*100), P, T);
-  vsl.addEventListener('input', () => {
-    volValues[i] = vsl.value / 100; setTrack(vsl, vsl.value, P, T);
-    if (currentOscGain && therapyPlaying && seqPos > 0 && currentSeq[seqPos-1] === i)
-      currentOscGain.gain.setTargetAtTime(volValues[i], ctx.currentTime, 0.015);
+  const vsl=row.querySelector('input');
+  setTrack(vsl,Math.round(volValues[i]*100),P,T);
+  vsl.addEventListener('input',()=>{
+    volValues[i]=vsl.value/100;setTrack(vsl,vsl.value,P,T);
+    if(currentOscGain&&therapyPlaying&&seqPos>0&&currentSeq[seqPos-1]===i)
+      currentOscGain.gain.setTargetAtTime(volValues[i],ctx.currentTime,0.015);
+    saveSettings();
   });
   rowEls.push(row);
 });
-function setActiveRow(idx) { rowEls.forEach((r, i) => r.classList.toggle('playing', i === idx)); }
-function clearRows() { rowEls.forEach(r => r.classList.remove('playing')); }
+if(saved.randVol) document.getElementById('rand-vol').checked=true;
+if(saved.randWave)document.getElementById('rand-wave').checked=true;
+document.getElementById('rand-vol').addEventListener('change',saveSettings);
+document.getElementById('rand-wave').addEventListener('change',saveSettings);
+function setActiveRow(idx){rowEls.forEach((r,i)=>r.classList.toggle('playing',i===idx));}
+function clearRows(){rowEls.forEach(r=>r.classList.remove('playing'));}
 
 // ── Dots ───────────────────────────────────────────────────────────────────
-const seqEl = document.getElementById('seq-track');
-let dots = [];
-function buildDots(n) {
-  seqEl.innerHTML = ''; dots = [];
-  for (let i = 0; i < n; i++) { const d = document.createElement('div'); d.className = 'seq-dot'; seqEl.appendChild(d); dots.push(d); }
+const seqEl=document.getElementById('seq-track');
+let dots=[];
+function buildDots(n){seqEl.innerHTML='';dots=[];for(let i=0;i<n;i++){const d=document.createElement('div');d.className='seq-dot';seqEl.appendChild(d);dots.push(d);}}
+function updDots(pos,pausing){dots.forEach((d,i)=>{d.classList.remove('current','done');if(pausing)d.classList.add('done');else if(i<pos)d.classList.add('done');else if(i===pos)d.classList.add('current');});}
+
+// ── Fade helpers ───────────────────────────────────────────────────────────
+function startToneWithFade(osc,gainNode,targetGain,when){
+  gainNode.gain.setValueAtTime(0,when);
+  gainNode.gain.linearRampToValueAtTime(targetGain,when+FADE);
 }
-function updDots(pos, pausing) {
-  dots.forEach((d, i) => {
-    d.classList.remove('current','done');
-    if (pausing) d.classList.add('done');
-    else if (i < pos) d.classList.add('done');
-    else if (i === pos) d.classList.add('current');
-  });
+function stopToneWithFade(osc,gainNode,when){
+  const t=when||ctx.currentTime;
+  gainNode.gain.setValueAtTime(gainNode.gain.value,t);
+  gainNode.gain.linearRampToValueAtTime(0,t+FADE);
+  osc.stop(t+FADE+0.005);
 }
 
 // ── Preview ────────────────────────────────────────────────────────────────
-prevBtn.addEventListener('click', () => {
-  if (previewPlaying) {
-    previewOsc.stop(); previewOsc = null;
-    previewPlaying = false; setPrev(false);
-    document.getElementById('status').textContent = '';
+prevBtn.addEventListener('click',()=>{
+  if(previewPlaying){
+    stopToneWithFade(previewOsc,previewOsc._gain,ctx.currentTime);
+    previewOsc=null;previewPlaying=false;setPrev(false);
+    document.getElementById('status').textContent='';
   } else {
-    stopTherapy(); initAudio();
-    const osc = ctx.createOscillator(), g = ctx.createGain();
-    osc.type = currentWaveform; osc.frequency.value = tinnitusHz; g.gain.value = 0.3;
-    osc.connect(g); g.connect(masterGainNode); osc.start();
-    previewOsc = osc; previewPlaying = true; setPrev(true);
-    document.getElementById('status').textContent = 'Previewing tinnitus tone';
+    stopTherapy();initAudio();
+    const osc=ctx.createOscillator(),g=ctx.createGain();
+    osc.type=currentWaveform;osc.frequency.value=tinnitusHz;
+    osc.connect(g);g.connect(masterGainNode);
+    osc._gain=g;
+    startToneWithFade(osc,g,0.3,ctx.currentTime);
+    osc.start(ctx.currentTime);
+    previewOsc=osc;previewPlaying=true;setPrev(true);
+    document.getElementById('status').textContent='Previewing tinnitus tone';
   }
 });
 
 // ── Therapy ────────────────────────────────────────────────────────────────
-function stopTherapy() {
-  if (therapyTimer) { clearTimeout(therapyTimer); therapyTimer = null; }
-  if (currentOsc) { try { currentOsc.stop(); } catch(e){} currentOsc = null; }
-  currentOscGain = null; therapyPlaying = false; seqPos = 0; currentSeq = [];
-  clearRows(); seqEl.innerHTML = ''; dots = []; setMain(false);
-  document.getElementById('main-label').textContent = 'Play Therapy';
-  document.getElementById('status').textContent = '';
-  document.querySelectorAll('.wf-btn').forEach(b => b.classList.toggle('active', b.dataset.wave === currentWaveform));
+function stopTherapy(){
+  if(therapyTimer){clearTimeout(therapyTimer);therapyTimer=null;}
+  if(currentOsc){try{currentOsc.stop();}catch(e){}currentOsc=null;}
+  currentOscGain=null;therapyPlaying=false;seqPos=0;currentSeq=[];
+  clearRows();seqEl.innerHTML='';dots=[];setMain(false);
+  mainBtn.classList.remove('main-btn-pulse');
+  document.getElementById('main-label').textContent='PLAY THERAPY';
+  document.getElementById('status').textContent='';
+  document.querySelectorAll('.wf-btn').forEach(b=>b.classList.toggle('active',b.dataset.wave===currentWaveform));
 }
 
-function playNext() {
-  if (!therapyPlaying) return;
-  if (currentOsc) { try { currentOsc.stop(); } catch(e){} currentOsc = null; currentOscGain = null; }
-  if (seqPos >= seqLen) {
-    clearRows(); updDots(seqPos, true);
-    document.getElementById('status').textContent = 'Pause…';
-    const last = currentSeq[seqLen - 1];
-    therapyTimer = setTimeout(() => {
-      if (!therapyPlaying) return;
-      seqLen = randSeqLen(); currentSeq = randSeq(seqLen, last); seqPos = 0; buildDots(seqLen);
-      const WF = ['sine','triangle','sawtooth','square'];
-      if (document.getElementById('rand-wave').checked) seqWaveform = WF[Math.floor(Math.random()*WF.length)];
+function playNext(){
+  if(!therapyPlaying)return;
+  currentOsc=null;currentOscGain=null;
+  if(seqPos>=seqLen){
+    clearRows();updDots(seqPos,true);
+    document.getElementById('status').textContent='Pause…';
+    const last=currentSeq[seqLen-1];
+    therapyTimer=setTimeout(()=>{
+      if(!therapyPlaying)return;
+      seqLen=randSeqLen();currentSeq=randSeq(seqLen,last);seqPos=0;buildDots(seqLen);
+      const WF=['sine','triangle','sawtooth','square'];
+      if(document.getElementById('rand-wave').checked)seqWaveform=WF[Math.floor(Math.random()*WF.length)];
       playNext();
-    }, randPause());
+    },document.getElementById('rand-seq-break').checked?Math.random()*5000:seqBreakMs);
     return;
   }
-  const idx = currentSeq[seqPos], freqs = tFreqs();
-  const isRand = document.getElementById('rand-vol').checked;
-  const toneGainVal = volValues[idx] * (isRand ? Math.random() : 1.0);
-  const WF = ['sine','triangle','sawtooth','square'];
-  const waveform = document.getElementById('rand-wave').checked ? seqWaveform : currentWaveform;
-  document.querySelectorAll('.wf-btn').forEach(b => b.classList.toggle('active', b.dataset.wave === waveform));
-  const osc = ctx.createOscillator(), g = ctx.createGain();
-  osc.type = waveform; osc.frequency.value = freqs[idx]; g.gain.value = toneGainVal;
-  osc.connect(g); g.connect(masterGainNode); osc.start();
-  currentOsc = osc; currentOscGain = g;
-  setActiveRow(idx); updDots(seqPos, false);
-  const volPct = Math.round(toneGainVal * 100);
-  document.getElementById('status').textContent =
-    'Tone ' + (seqPos+1) + '/' + seqLen + ' — ' + fmtHz(freqs[idx]) + (isRand ? '  [vol: '+volPct+'%]' : '');
-  seqPos++; therapyTimer = setTimeout(playNext, TONE_DUR);
+  const idx=currentSeq[seqPos],freqs=tFreqs();
+  const isRand=document.getElementById('rand-vol').checked;
+  const toneGainVal=volValues[idx]*(isRand?Math.random():1.0);
+  const WF=['sine','triangle','sawtooth','square'];
+  const waveform=document.getElementById('rand-wave').checked?seqWaveform:currentWaveform;
+  document.querySelectorAll('.wf-btn').forEach(b=>b.classList.toggle('active',b.dataset.wave===waveform));
+  const now=ctx.currentTime;
+  const osc=ctx.createOscillator(),g=ctx.createGain();
+  osc.type=waveform;osc.frequency.value=freqs[idx];
+  osc.connect(g);g.connect(masterGainNode);
+  g.gain.setValueAtTime(0,now);
+  g.gain.linearRampToValueAtTime(toneGainVal,now+FADE);
+  osc.start(now);
+  const fadeOutAt=now+TONE_DUR/1000;
+  g.gain.setValueAtTime(toneGainVal,fadeOutAt);
+  g.gain.linearRampToValueAtTime(0,fadeOutAt+FADE);
+  osc.stop(fadeOutAt+FADE+0.005);
+  currentOsc=osc;currentOscGain=g;
+  setActiveRow(idx);updDots(seqPos,false);
+  const volPct=Math.round(toneGainVal*100);
+  document.getElementById('status').textContent='Tone '+(seqPos+1)+'/'+seqLen+' — '+fmtHz(freqs[idx])+(isRand?'  [vol: '+volPct+'%]':'');
+  seqPos++;
+  therapyTimer=setTimeout(playNext,TONE_DUR+FADE*1000+toneBetweakBreakMs);
 }
 
-mainBtn.addEventListener('click', () => {
-  if (therapyPlaying) { stopTherapy(); }
-  else {
-    if (previewPlaying) { previewOsc.stop(); previewOsc = null; previewPlaying = false; setPrev(false); }
-    initAudio(); therapyPlaying = true;
-    seqLen = randSeqLen(); currentSeq = randSeq(seqLen); seqPos = 0;
-    const WF = ['sine','triangle','sawtooth','square'];
-    seqWaveform = document.getElementById('rand-wave').checked
-      ? WF[Math.floor(Math.random()*WF.length)] : currentWaveform;
-    buildDots(seqLen); setMain(true);
-    document.getElementById('main-label').textContent = 'Stop Therapy';
+mainBtn.addEventListener('click',()=>{
+  if(therapyPlaying){stopTherapy();}
+  else{
+    if(previewPlaying){stopToneWithFade(previewOsc,previewOsc._gain,ctx.currentTime);previewOsc=null;previewPlaying=false;setPrev(false);}
+    initAudio();therapyPlaying=true;
+    seqLen=randSeqLen();currentSeq=randSeq(seqLen);seqPos=0;
+    const WF=['sine','triangle','sawtooth','square'];
+    seqWaveform=document.getElementById('rand-wave').checked?WF[Math.floor(Math.random()*WF.length)]:currentWaveform;
+    buildDots(seqLen);setMain(true);
+    mainBtn.classList.add('main-btn-pulse');
+    document.getElementById('main-label').textContent='STOP THERAPY';
     playNext();
   }
 });
 
 // ── Background noise ───────────────────────────────────────────────────────
-let noiseType = 'white', noisePlaying = false;
-let noiseSource = null, noiseFilter = null, noiseGainNode = null;
-let noiseVol = 0.5, noiseFreqHz = 1000;
+let noiseType=saved.noiseType||'white',noisePlaying=false;
+let noiseSource=null,noiseFilter=null,noiseGainNode=null;
+let noiseVol=saved.noiseVol!==undefined?saved.noiseVol:0.5;
+let noiseFreqHz=saved.noiseFreqHz||1000;
 
-function buildNoiseBuffer(type) {
-  const rate = ctx.sampleRate, size = rate * 2;
-  const buf = ctx.createBuffer(1, size, rate), d = buf.getChannelData(0);
-  if (type === 'white') {
-    for (let i = 0; i < size; i++) d[i] = Math.random() * 2 - 1;
-  } else if (type === 'pink') {
+document.querySelectorAll('.noise-pill').forEach(b=>b.classList.toggle('active',b.dataset.noise===noiseType));
+
+function buildNoiseBuffer(type){
+  const rate=ctx.sampleRate,size=rate*2;
+  const buf=ctx.createBuffer(1,size,rate),d=buf.getChannelData(0);
+  if(type==='white'){
+    for(let i=0;i<size;i++)d[i]=Math.random()*2-1;
+  } else if(type==='pink'){
     let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
-    for (let i = 0; i < size; i++) {
-      const w = Math.random()*2-1;
-      b0=0.99886*b0+w*0.0555179; b1=0.99332*b1+w*0.0750759;
-      b2=0.96900*b2+w*0.1538520; b3=0.86650*b3+w*0.3104856;
-      b4=0.55000*b4+w*0.5329522; b5=-0.7616*b5-w*0.0168980;
-      d[i]=(b0+b1+b2+b3+b4+b5+b6+w*0.5362)/4; b6=w*0.115926;
-    }
-  } else {
+    for(let i=0;i<size;i++){const w=Math.random()*2-1;b0=0.99886*b0+w*0.0555179;b1=0.99332*b1+w*0.0750759;b2=0.96900*b2+w*0.1538520;b3=0.86650*b3+w*0.3104856;b4=0.55000*b4+w*0.5329522;b5=-0.7616*b5-w*0.0168980;d[i]=(b0+b1+b2+b3+b4+b5+b6+w*0.5362)/4;b6=w*0.115926;}
+  } else if(type==='brown'){
+    let last=0;for(let i=0;i<size;i++){const w=Math.random()*2-1;last=(last+0.02*w)/1.02;d[i]=last*3.5;}
+  } else if(type==='blue'){
+    // Blue noise: emphasises high frequencies (differentiated white)
     let last=0;
-    for (let i=0;i<size;i++){const w=Math.random()*2-1;last=(last+0.02*w)/1.02;d[i]=last*3.5;}
+    for(let i=0;i<size;i++){const w=Math.random()*2-1;d[i]=(w-last)*0.5;last=w;}
+  } else if(type==='violet'){
+    // Violet noise: double-differentiated, even brighter
+    let lastW=0,lastB=0;
+    for(let i=0;i<size;i++){const w=Math.random()*2-1;const blue=(w-lastW)*0.5;d[i]=(blue-lastB)*0.5;lastB=blue;lastW=w;}
+  } else if(type==='grey'){
+    // Grey noise: white noise shaped to sound perceptually flat (A-weighted approximation)
+    // Achieved via a gentle mid-frequency boost and bass/treble roll-off using IIR-style filter
+    let b0=0,b1=0;
+    for(let i=0;i<size;i++){
+      const w=Math.random()*2-1;
+      b0=0.9*b0+w*0.1; // low-pass for bass
+      b1=0.4*b1+w*0.6; // mid pass
+      d[i]=Math.max(-1,Math.min(1,(b1-b0*0.5)*1.2));
+    }
   }
   return buf;
 }
-
-function startNoise() {
+const NOISE_FADE_IN=0.5,NOISE_FADE_OUT=0.3;
+function startNoise(){
   initAudio();
-  const src = ctx.createBufferSource(); src.buffer = buildNoiseBuffer(noiseType); src.loop = true;
-  const filt = ctx.createBiquadFilter(); filt.type='bandpass'; filt.frequency.value=noiseFreqHz; filt.Q.value=0.8;
-  const gain = ctx.createGain(); gain.gain.value = noiseVol;
-  src.connect(filt); filt.connect(gain); gain.connect(ctx.destination);
+  const src=ctx.createBufferSource();src.buffer=buildNoiseBuffer(noiseType);src.loop=true;
+  const filt=ctx.createBiquadFilter();filt.type='bandpass';filt.frequency.value=noiseFreqHz;filt.Q.value=0.8;
+  const gain=ctx.createGain();
+  gain.gain.setValueAtTime(0,ctx.currentTime);
+  gain.gain.linearRampToValueAtTime(noiseVol,ctx.currentTime+NOISE_FADE_IN);
+  src.connect(filt);filt.connect(gain);gain.connect(ctx.destination);
   src.start();
-  noiseSource=src; noiseFilter=filt; noiseGainNode=gain;
-  noisePlaying=true; setNoise(true);
+  noiseSource=src;noiseFilter=filt;noiseGainNode=gain;
+  noisePlaying=true;setNoise(true);
 }
-function stopNoise() {
-  if (noiseSource){try{noiseSource.stop();}catch(e){}noiseSource=null;}
-  noiseFilter=null; noiseGainNode=null; noisePlaying=false; setNoise(false);
+function stopNoise(){
+  if(noiseSource&&noiseGainNode){
+    const src=noiseSource,t=ctx.currentTime;
+    noiseGainNode.gain.setValueAtTime(noiseGainNode.gain.value,t);
+    noiseGainNode.gain.linearRampToValueAtTime(0,t+NOISE_FADE_OUT);
+    src.stop(t+NOISE_FADE_OUT+0.05);
+  }
+  noiseSource=null;noiseFilter=null;noiseGainNode=null;noisePlaying=false;setNoise(false);
 }
-noiseBtn.addEventListener('click', () => { if (noisePlaying) stopNoise(); else startNoise(); });
-document.querySelectorAll('.noise-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    noiseType = btn.dataset.noise;
-    document.querySelectorAll('.noise-btn').forEach(b => b.classList.remove('active'));
+noiseBtn.addEventListener('click',()=>{if(noisePlaying)stopNoise();else startNoise();});
+document.querySelectorAll('.noise-pill').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    noiseType=btn.dataset.noise;
+    document.querySelectorAll('.noise-pill').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
-    if (noisePlaying) { stopNoise(); startNoise(); }
+    if(noisePlaying){stopNoise();startNoise();}
+    saveSettings();
   });
 });
-
-const noiseVolSl = document.getElementById('noise-vol');
-setTrack(noiseVolSl, 50, P, T);
-noiseVolSl.addEventListener('input', () => {
-  noiseVol = noiseVolSl.value / 100;
-  document.getElementById('noise-vol-lbl').textContent = noiseVolSl.value + '%';
-  setTrack(noiseVolSl, noiseVolSl.value, P, T);
-  if (noiseGainNode) noiseGainNode.gain.setTargetAtTime(noiseVol, ctx.currentTime, 0.015);
+const noiseVolSl=document.getElementById('noise-vol');
+noiseVolSl.value=Math.round(noiseVol*100);
+setTrack(noiseVolSl,noiseVolSl.value,P,T);
+document.getElementById('noise-vol-lbl').textContent=noiseVolSl.value+'%';
+noiseVolSl.addEventListener('input',()=>{
+  noiseVol=noiseVolSl.value/100;
+  document.getElementById('noise-vol-lbl').textContent=noiseVolSl.value+'%';
+  setTrack(noiseVolSl,noiseVolSl.value,P,T);
+  if(noiseGainNode)noiseGainNode.gain.setTargetAtTime(noiseVol,ctx.currentTime,0.015);
+  saveSettings();
+});
+const noiseFreqSl=document.getElementById('noise-freq-sl');
+noiseFreqSl.value=noiseFreqHz;
+setTrack(noiseFreqSl,((noiseFreqHz-100)/(12000-100)*100).toFixed(2),P,T);
+document.getElementById('noise-freq-lbl').textContent=fmtHz(noiseFreqHz);
+noiseFreqSl.addEventListener('input',()=>{
+  noiseFreqHz=parseInt(noiseFreqSl.value);
+  document.getElementById('noise-freq-lbl').textContent=fmtHz(noiseFreqHz);
+  setTrack(noiseFreqSl,((noiseFreqHz-100)/(12000-100)*100).toFixed(2),P,T);
+  if(noiseFilter)noiseFilter.frequency.setTargetAtTime(noiseFreqHz,ctx.currentTime,0.02);
+  saveSettings();
 });
 
-const noiseFreqSl = document.getElementById('noise-freq-sl');
-setTrack(noiseFreqSl, ((1000-100)/(12000-100)*100).toFixed(2), P, T);
-noiseFreqSl.addEventListener('input', () => {
-  noiseFreqHz = parseInt(noiseFreqSl.value);
-  document.getElementById('noise-freq-lbl').textContent = fmtHz(noiseFreqHz);
-  setTrack(noiseFreqSl, ((noiseFreqHz-100)/(12000-100)*100).toFixed(2), P, T);
-  if (noiseFilter) noiseFilter.frequency.setTargetAtTime(noiseFreqHz, ctx.currentTime, 0.02);
+// ── Break sliders ──────────────────────────────────────────────────────────
+const toneBreakSl=document.getElementById('tone-break-sl');
+setTrack(toneBreakSl,0,P,T);
+toneBreakSl.addEventListener('input',()=>{
+  toneBetweakBreakMs=parseInt(toneBreakSl.value);
+  document.getElementById('tone-break-lbl').textContent=toneBetweakBreakMs+' ms';
+  setTrack(toneBreakSl,(toneBetweakBreakMs/500*100).toFixed(1),P,T);
+  saveSettings();
 });
+const seqBreakSl=document.getElementById('seq-break-sl');
+setTrack(seqBreakSl,(1000/5000*100).toFixed(1),P,T);
+seqBreakSl.addEventListener('input',()=>{
+  seqBreakMs=parseInt(seqBreakSl.value);
+  const lbl=seqBreakMs>=1000?(seqBreakMs/1000).toFixed(1).replace(/\.0$/,'')+' s':seqBreakMs+' ms';
+  document.getElementById('seq-break-lbl').textContent=lbl;
+  setTrack(seqBreakSl,(seqBreakMs/5000*100).toFixed(1),P,T);
+  saveSettings();
+});
+
+// ── Onboarding ─────────────────────────────────────────────────────────────
+const onboard=document.getElementById('onboard');
+const obSlider=document.getElementById('ob-slider');
+const obFreqDisp=document.getElementById('ob-freq-display');
+let obHz=tinnitusHz,obPlaying=false,obOsc=null;
+
+function updObFreq(){
+  const f=obHz;
+  obFreqDisp.innerHTML=f>=1000?(f/1000).toFixed(2).replace(/\.?0+$/,'')+'&nbsp;<em>kHz</em>':f+'&nbsp;<em>Hz</em>';
+  setTrack(obSlider,((f-100)/(12000-100)*100).toFixed(2),P,T);
+}
+obSlider.value=obHz;updObFreq();
+obSlider.addEventListener('input',()=>{
+  obHz=parseInt(obSlider.value);updObFreq();
+  if(obPlaying&&obOsc)obOsc.frequency.setTargetAtTime(obHz,ctx.currentTime,0.03);
+});
+obPlayBtn.addEventListener('click',()=>{
+  if(obPlaying){if(obOsc){try{obOsc.stop();}catch(e){}obOsc=null;}obPlaying=false;setObPlay(false);}
+  else{
+    initAudio();
+    const osc=ctx.createOscillator(),g=ctx.createGain();
+    osc.type='sine';osc.frequency.value=obHz;g.gain.value=0.25;
+    osc.connect(g);g.connect(masterGainNode);osc.start();
+    obOsc=osc;obPlaying=true;setObPlay(true);
+  }
+});
+function closeOnboard(){
+  if(obOsc){try{obOsc.stop();}catch(e){}obOsc=null;}
+  obPlaying=false;setObPlay(false);
+  tinnitusHz=obHz;tSl.value=tinnitusHz;
+  drawArc();updFreqDisplay();
+  onboard.classList.add('hidden');saveSettings();
+}
+obConfirmBtn.addEventListener('click',closeOnboard);
+document.getElementById('ob-skip').addEventListener('click',()=>{
+  if(obOsc){try{obOsc.stop();}catch(e){}obOsc=null;}
+  onboard.classList.add('hidden');
+});
+if(!isFirstVisit)onboard.classList.add('hidden');
 </script>
 </body>
 </html>
