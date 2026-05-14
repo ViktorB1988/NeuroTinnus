@@ -130,6 +130,20 @@ input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:4px;bord
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--primary);cursor:pointer}
 input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--primary);cursor:pointer;border:none}
 
+/* ── Hero volume slider (play card) — matches arc dial style ────────────── */
+.vol-hero-sl{height:6px!important;border-radius:3px!important;}
+.vol-hero-sl::-webkit-slider-thumb{
+  width:20px!important;height:20px!important;
+  background:var(--arc-thumb)!important;
+  box-shadow:0 0 0 3px var(--arc-track)!important;
+}
+.vol-hero-sl::-moz-range-thumb{
+  width:20px!important;height:20px!important;
+  background:var(--arc-thumb)!important;
+  box-shadow:0 0 0 3px var(--arc-track)!important;
+}
+.vol-pct-badge{font-size:11px;font-weight:600;color:var(--primary);background:color-mix(in srgb,var(--primary) 12%,transparent);border-radius:6px;padding:2px 7px;letter-spacing:0.2px;min-width:38px;text-align:center;flex-shrink:0;transition:background 0.25s,color 0.25s;}
+
 /* ── Play hero ───────────────────────────────────────────────────────────── */
 .play-hero{display:flex;flex-direction:column;align-items:center;gap:8px;padding:6px 0}
 .play-ring-wrap{position:relative;width:88px;height:88px;display:flex;align-items:center;justify-content:center}
@@ -224,47 +238,63 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
     <div class="tab-panel active" id="panel-session">
 
       <!-- Arc dial -->
-      <div class="arc-card">
-        <div class="arc-hint" style="margin-bottom:10px">What does your tinnitus frequency sound like?</div>
-        <div class="arc-freq-display" id="freq-display" style="margin-bottom:10px">2660&nbsp;<em>Hz</em></div>
+      <div class="arc-card" style="padding:10px 15px 12px">
         <div class="arc-svg-wrap" id="arc-wrap" aria-label="Tinnitus frequency dial">
-          <svg id="arc-svg" viewBox="0 0 220 95" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;overflow:visible">
-            <!-- Background arc -->
-            <path id="arc-bg"   fill="none" stroke-width="6" stroke-linecap="round"/>
-            <!-- Progress arc -->
-            <path id="arc-prog" fill="none" stroke-width="6" stroke-linecap="round"/>
+          <svg id="arc-svg" viewBox="0 0 280 235" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;overflow:visible">
+            <!-- Track & progress arcs -->
+            <path id="arc-bg"   fill="none" stroke-width="8" stroke-linecap="round"/>
+            <path id="arc-prog" fill="none" stroke-width="8" stroke-linecap="round"/>
             <!-- Thumb -->
-            <circle id="arc-thumb" r="9" stroke-width="3"/>
-            <!-- Labels -->
-            <text id="arc-lbl-min" text-anchor="start"  font-size="10" font-family="Figtree,sans-serif">100 Hz</text>
-            <text id="arc-lbl-max" text-anchor="end"    font-size="10" font-family="Figtree,sans-serif">12 kHz</text>
+            <circle id="arc-thumb" r="10" stroke-width="3"/>
+            <!-- Endpoint labels -->
+            <text id="arc-lbl-min" text-anchor="middle" font-size="11" font-family="Figtree,sans-serif"></text>
+            <text id="arc-lbl-max" text-anchor="middle" font-size="11" font-family="Figtree,sans-serif"></text>
+            <!-- Inner content: caption -->
+            <text text-anchor="middle" x="140" y="83" font-size="9" font-weight="600"
+                  font-family="Figtree,sans-serif" letter-spacing="1.5" style="fill:var(--muted)">FREQUENCY</text>
+            <!-- Frequency value (updated by JS) -->
+            <text id="arc-freq-text" text-anchor="middle" x="140" y="118"
+                  font-family="Figtree,sans-serif"></text>
+            <!-- Preview button -->
+            <g id="arc-prev-g" style="cursor:pointer" role="button" aria-label="Preview tone">
+              <circle id="arc-prev-bg" cx="140" cy="155" r="18" stroke-width="2.5"/>
+              <g id="arc-prev-play">
+                <polygon id="arc-prev-play-icon" points="137,149 137,161 150,155"/>
+              </g>
+              <g id="arc-prev-pause" style="display:none">
+                <rect x="133" y="149" width="5" height="12" rx="1" id="arc-pp-l"/>
+                <rect x="142" y="149" width="5" height="12" rx="1" id="arc-pp-r"/>
+              </g>
+            </g>
+            <!-- Preview label -->
+            <text text-anchor="middle" x="140" y="188" font-size="9" font-weight="500"
+                  font-family="Figtree,sans-serif" letter-spacing="0.8" style="fill:var(--muted)">PREVIEW TONE</text>
           </svg>
         </div>
         <input type="range" id="tinnitus-slider" min="100" max="12000" step="10" value="2660" style="display:none">
-        <div class="arc-row">
-          <span style="font-size:11px;color:var(--muted)">Preview your tone</span>
-          <div id="prev-wrap"></div>
-        </div>
+        <div id="prev-wrap" style="display:none"></div>
       </div>
 
-      <!-- Therapy vol -->
-      <div class="card">
-        <div class="vol-strip">
-          <span class="vol-lbl">Therapy volume</span>
-          <input type="range" id="master-vol" min="0" max="100" step="1" value="20">
-          <span class="vol-val" id="mvlbl">20%</span>
-        </div>
-      </div>
-
-      <!-- Play hero -->
-      <div class="play-hero">
-        <div class="play-ring-wrap" id="main-ring-wrap">
-          <div class="pulse-ring"></div>
+      <!-- Play + volume combined -->
+      <div class="card" style="display:flex;align-items:center;gap:14px;padding:13px 15px;">
+        <div style="position:relative;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+          <div class="pulse-ring" style="position:absolute;inset:-8px;border-radius:50%;border:1.5px solid var(--primary);opacity:0;pointer-events:none"></div>
           <div id="main-wrap-btn"></div>
         </div>
-        <div class="play-lbl" id="main-label">PLAY THERAPY</div>
+        <!-- subtle vertical divider -->
+        <div style="width:0.5px;height:44px;background:var(--border);flex-shrink:0;border-radius:1px;"></div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:9px;min-width:0;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;opacity:0.55">
+              <path d="M11 5L6 9H2v6h4l5 4V5z" fill="var(--primary)"/>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <span id="main-label" style="font-size:10px;font-weight:600;color:var(--muted);letter-spacing:0.6px;text-transform:uppercase;flex:1;">PLAY THERAPY</span>
+            <span class="vol-pct-badge" id="mvlbl">20%</span>
+          </div>
+          <input type="range" class="vol-hero-sl" id="master-vol" min="0" max="100" step="1" value="20">
+        </div>
       </div>
-
       <!-- Sequence progress -->
       <div class="seq-track" id="seq-track"></div>
       <div class="status-line" id="status"></div>
@@ -272,16 +302,39 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
       <!-- Noise strip -->
       <div class="section-lbl">Background Noise</div>
       <div class="card noise-card">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-          <div id="noise-btn-wrap"></div>
-          <div class="noise-types" style="flex-wrap:wrap;gap:5px">
-            <button class="noise-pill active" data-noise="white">White</button>
-            <button class="noise-pill" data-noise="pink">Pink</button>
-            <button class="noise-pill" data-noise="brown">Brown</button>
-            <button class="noise-pill" data-noise="blue">Blue</button>
-            <button class="noise-pill" data-noise="violet">Violet</button>
-            <button class="noise-pill" data-noise="grey">Grey</button>
+
+        <!-- Play + volume row — same pattern as main play card -->
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+          <div style="position:relative;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+            <div id="noise-btn-wrap"></div>
           </div>
+          <div style="width:0.5px;height:44px;background:var(--border);flex-shrink:0;border-radius:1px;"></div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:9px;min-width:0;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;opacity:0.55">
+                <path d="M11 5L6 9H2v6h4l5 4V5z" fill="var(--primary)"/>
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <span style="font-size:10px;font-weight:600;color:var(--muted);letter-spacing:0.6px;text-transform:uppercase;flex:1;">NOISE VOLUME</span>
+              <span class="vol-pct-badge" id="noise-vol-lbl">50%</span>
+            </div>
+            <input type="range" class="vol-hero-sl" id="noise-vol" min="0" max="100" step="1" value="50">
+          </div>
+        </div>
+
+        <!-- Noise type selectors -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <div style="height:0.5px;background:var(--border);flex:1"></div>
+          <span style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;white-space:nowrap">Noise</span>
+          <div style="height:0.5px;background:var(--border);flex:1"></div>
+        </div>
+        <div class="noise-types" style="flex-wrap:wrap;gap:5px;margin-bottom:12px">
+          <button class="noise-pill active" data-noise="white">White</button>
+          <button class="noise-pill" data-noise="pink">Pink</button>
+          <button class="noise-pill" data-noise="brown">Brown</button>
+          <button class="noise-pill" data-noise="blue">Blue</button>
+          <button class="noise-pill" data-noise="violet">Violet</button>
+          <button class="noise-pill" data-noise="grey">Grey</button>
         </div>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
           <div style="height:0.5px;background:var(--border);flex:1"></div>
@@ -293,15 +346,40 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
           <button class="noise-pill" data-noise="ocean">🌊 Ocean</button>
           <button class="noise-pill" data-noise="wind">🍃 Wind</button>
           <button class="noise-pill" data-noise="birds-synth">🐦 Birds - synth</button>
+          <button class="noise-pill" data-noise="fire">🔥 Fire</button>
         </div>
-        <div class="vol-strip" style="margin-bottom:8px">
-          <span class="vol-lbl" style="font-size:13px">Volume</span>
-          <input type="range" id="noise-vol" min="0" max="100" step="1" value="50">
-          <span class="vol-val" id="noise-vol-lbl">50%</span>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <div style="height:0.5px;background:var(--border);flex:1"></div>
+          <span style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;white-space:nowrap">Therapeutic</span>
+          <div style="height:0.5px;background:var(--border);flex:1"></div>
         </div>
-        <div class="vol-strip" id="noise-freq-row">
+        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px">
+          <button class="noise-pill" data-noise="binaural">🎵 Binaural</button>
+        </div>
+        <div id="binaural-controls" style="display:none;margin-bottom:12px">
+          <div class="vol-strip" style="margin-bottom:6px">
+            <span class="vol-lbl" style="font-size:12px">Beat</span>
+            <input type="range" id="binaural-beat-sl" min="1" max="40" step="0.5" value="10">
+            <span class="vol-val" id="binaural-beat-lbl">10 Hz</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:10px;padding:0 2px">
+            <span class="beat-lbl" data-beat="2"  style="font-size:10px;cursor:pointer;color:var(--muted)">δ Delta</span>
+            <span class="beat-lbl" data-beat="6"  style="font-size:10px;cursor:pointer;color:var(--muted)">θ Theta</span>
+            <span class="beat-lbl" data-beat="10" style="font-size:10px;cursor:pointer;color:var(--primary);font-weight:600">α Alpha</span>
+            <span class="beat-lbl" data-beat="20" style="font-size:10px;cursor:pointer;color:var(--muted)">β Beta</span>
+            <span class="beat-lbl" data-beat="40" style="font-size:10px;cursor:pointer;color:var(--muted)">γ Gamma</span>
+          </div>
+          <div class="vol-strip">
+            <span class="vol-lbl" style="font-size:12px">Carrier</span>
+            <input type="range" id="binaural-carrier-sl" min="80" max="500" step="5" value="200">
+            <span class="vol-val" id="binaural-carrier-lbl">200 Hz</span>
+          </div>
+        </div>
+
+        <!-- Frequency + randomize -->
+        <div class="vol-strip" id="noise-freq-row" style="margin-bottom:10px">
           <span class="vol-lbl" style="font-size:13px">Frequency</span>
-          <input type="range" id="noise-freq-sl" min="100" max="12000" step="10" value="1000">
+          <input type="range" class="vol-hero-sl" id="noise-freq-sl" min="100" max="12000" step="10" value="1000">
           <span class="vol-val" id="noise-freq-lbl">1 kHz</span>
         </div>
         <div class="check-row">
@@ -518,8 +596,9 @@ function setTrack(el,pct,col,bg){el.style.background=`linear-gradient(to right,$
 const P='var(--primary)',T='var(--track)';
 
 // ── Arc dial ───────────────────────────────────────────────────────────────
-const ARC_CX=110, ARC_CY=110, ARC_R=82;
-const ARC_START=215, ARC_END=325; // degrees, clockwise in SVG
+// ARC_START=120°(lower-left) → ARC_END=420°(=60°, lower-right): 300° sweep clockwise through top
+const ARC_CX=140, ARC_CY=118, ARC_R=106;
+const ARC_START=120, ARC_END=420;
 
 function deg2rad(d){return d*Math.PI/180;}
 function arcPoint(deg){
@@ -556,14 +635,16 @@ function drawArc(){
   const fillCol =styles.getPropertyValue('--arc-fill').trim();
   const thumbCol=styles.getPropertyValue('--arc-thumb').trim();
   const mutedCol=styles.getPropertyValue('--muted').trim();
+  const primaryCol=styles.getPropertyValue('--primary').trim();
+  const btnBgCol=styles.getPropertyValue('--btn-bg').trim();
+  const freqCol=styles.getPropertyValue('--freq').trim();
+  const freqEmCol=styles.getPropertyValue('--freq-em').trim();
 
-  const fullPath=arcPath(ARC_START,ARC_END);
-  arcBg.setAttribute('d',fullPath);
+  arcBg.setAttribute('d',arcPath(ARC_START,ARC_END));
   arcBg.setAttribute('stroke',trackCol);
 
   const angle=hzToAngle(tinnitusHz);
-  const progPath=arcPath(ARC_START,angle);
-  arcProg.setAttribute('d',progPath);
+  arcProg.setAttribute('d',arcPath(ARC_START,Math.max(ARC_START+0.01,angle)));
   arcProg.setAttribute('stroke',fillCol);
 
   const tp=arcPoint(angle);
@@ -572,21 +653,42 @@ function drawArc(){
   arcThumb.setAttribute('fill',thumbCol);
   arcThumb.setAttribute('stroke',trackCol);
 
-  // Min/max labels at arc endpoints
+  // Endpoint labels just below the arc endpoints
   const minPt=arcPoint(ARC_START);
-  const maxPt=arcPoint(ARC_END);
-  arcLblMin.setAttribute('x',(parseFloat(minPt.x)-2).toFixed(1));
-  arcLblMin.setAttribute('y',(parseFloat(minPt.y)+14).toFixed(1));
+  const maxPt=arcPoint(ARC_END);   // arcPoint(420) = arcPoint(60)
+  arcLblMin.setAttribute('x',minPt.x);
+  arcLblMin.setAttribute('y',(parseFloat(minPt.y)+17).toFixed(1));
   arcLblMin.setAttribute('fill',mutedCol);
-  arcLblMax.setAttribute('x',(parseFloat(maxPt.x)+2).toFixed(1));
-  arcLblMax.setAttribute('y',(parseFloat(maxPt.y)+14).toFixed(1));
+  arcLblMin.textContent='100';
+  arcLblMax.setAttribute('x',maxPt.x);
+  arcLblMax.setAttribute('y',(parseFloat(maxPt.y)+17).toFixed(1));
   arcLblMax.setAttribute('fill',mutedCol);
+  arcLblMax.textContent='12k';
+
+  // Preview button colours
+  const prevBg=document.getElementById('arc-prev-bg');
+  if(prevBg){prevBg.setAttribute('fill',btnBgCol);prevBg.setAttribute('stroke',primaryCol);}
+  const playIcon=document.getElementById('arc-prev-play-icon');
+  if(playIcon)playIcon.setAttribute('fill',primaryCol);
+  ['arc-pp-l','arc-pp-r'].forEach(id=>{const el=document.getElementById(id);if(el)el.setAttribute('fill',primaryCol);});
+
+  updFreqDisplay();
 }
 
-const fDisp=document.getElementById('freq-display');
 function updFreqDisplay(){
   const f=tinnitusHz;
-  fDisp.innerHTML=f>=1000?(f/1000).toFixed(2).replace(/\.?0+$/,'')+'&nbsp;<em>kHz</em>':f+'&nbsp;<em>Hz</em>';
+  const styles=getComputedStyle(document.body);
+  const freqCol=styles.getPropertyValue('--freq').trim();
+  const freqEmCol=styles.getPropertyValue('--freq-em').trim();
+  const freqEl=document.getElementById('arc-freq-text');
+  if(freqEl){
+    if(f>=1000){
+      const val=(f/1000).toFixed(2).replace(/\.?0+$/,'');
+      freqEl.innerHTML=`<tspan font-size="28" font-weight="600" fill="${freqCol}">${val}</tspan><tspan font-size="14" fill="${freqEmCol}"> kHz</tspan>`;
+    } else {
+      freqEl.innerHTML=`<tspan font-size="28" font-weight="600" fill="${freqCol}">${Math.round(f)}</tspan><tspan font-size="14" fill="${freqEmCol}"> Hz</tspan>`;
+    }
+  }
   tFreqs().forEach((freq,i)=>{const el=document.getElementById('tl'+i);if(el)el.textContent=fmtHz(freq);});
 }
 drawArc();
@@ -598,18 +700,15 @@ function pointerToAngle(e){
   const rect=arcSvg.getBoundingClientRect();
   const clientX=e.touches?e.touches[0].clientX:e.clientX;
   const clientY=e.touches?e.touches[0].clientY:e.clientY;
-  const svgX=(clientX-rect.left)/rect.width*220;
-  const svgY=(clientY-rect.top)/rect.height*130;
+  const svgX=(clientX-rect.left)/rect.width*280;
+  const svgY=(clientY-rect.top)/rect.height*235;
   const dx=svgX-ARC_CX, dy=svgY-ARC_CY;
   let angle=Math.atan2(dy,dx)*180/Math.PI;
   if(angle<0)angle+=360;
-  // Clamp to arc range [ARC_START, ARC_END]
-  if(angle<ARC_START){
-    // In the gap region — snap to nearest endpoint
-    const dStart=ARC_START-angle;
-    const dEnd=360-ARC_END+angle;
-    angle=dStart<dEnd?ARC_START:ARC_END;
-  }
+  // Angles in [0,60) belong to the end of the arc → map to [360,420)
+  if(angle<60)angle+=360;
+  // Gap region [60,120): snap to nearest endpoint
+  if(angle<ARC_START){angle=angle<90?ARC_END:ARC_START;}
   return Math.max(ARC_START,Math.min(ARC_END,angle));
 }
 function applyArcAngle(angle){
@@ -633,14 +732,15 @@ const tSl=document.getElementById('tinnitus-slider');
 tSl.addEventListener('input',()=>{tinnitusHz=parseInt(tSl.value);drawArc();updFreqDisplay();saveSettings();});
 
 // ── Master volume ──────────────────────────────────────────────────────────
+const AF='var(--arc-fill)',AT='var(--arc-track)';
 const mvSl=document.getElementById('master-vol');
 mvSl.value=Math.round(masterVol*100);
-setTrack(mvSl,mvSl.value,P,T);
+setTrack(mvSl,mvSl.value,AF,AT);
 document.getElementById('mvlbl').textContent=mvSl.value+'%';
 mvSl.addEventListener('input',()=>{
   masterVol=mvSl.value/100;
   document.getElementById('mvlbl').textContent=mvSl.value+'%';
-  setTrack(mvSl,mvSl.value,P,T);
+  setTrack(mvSl,mvSl.value,AF,AT);
   if(masterGainNode)masterGainNode.gain.setTargetAtTime(masterVol,ctx.currentTime,0.015);
   saveSettings();
 });
@@ -702,10 +802,21 @@ function stopToneWithFade(osc,gainNode,when){
 }
 
 // ── Preview ────────────────────────────────────────────────────────────────
+// Sync the SVG play/pause icon inside the arc dial
+function syncPrevSvg(playing){
+  const pg=document.getElementById('arc-prev-play');
+  const pa=document.getElementById('arc-prev-pause');
+  if(pg)pg.style.display=playing?'none':'';
+  if(pa)pa.style.display=playing?'':'none';
+}
+
+// SVG preview button delegates to prevBtn
+document.getElementById('arc-prev-g').addEventListener('click',()=>prevBtn.click());
+
 prevBtn.addEventListener('click',()=>{
   if(previewPlaying){
     stopToneWithFade(previewOsc,previewOsc._gain,ctx.currentTime);
-    previewOsc=null;previewPlaying=false;setPrev(false);
+    previewOsc=null;previewPlaying=false;setPrev(false);syncPrevSvg(false);
     document.getElementById('status').textContent='';
   } else {
     stopTherapy();initAudio();
@@ -715,7 +826,7 @@ prevBtn.addEventListener('click',()=>{
     osc._gain=g;
     startToneWithFade(osc,g,0.3,ctx.currentTime);
     osc.start(ctx.currentTime);
-    previewOsc=osc;previewPlaying=true;setPrev(true);
+    previewOsc=osc;previewPlaying=true;setPrev(true);syncPrevSvg(true);
     document.getElementById('status').textContent='Previewing tinnitus tone';
   }
 });
@@ -776,7 +887,7 @@ function playNext(){
 mainBtn.addEventListener('click',()=>{
   if(therapyPlaying){stopTherapy();}
   else{
-    if(previewPlaying){stopToneWithFade(previewOsc,previewOsc._gain,ctx.currentTime);previewOsc=null;previewPlaying=false;setPrev(false);}
+    if(previewPlaying){stopToneWithFade(previewOsc,previewOsc._gain,ctx.currentTime);previewOsc=null;previewPlaying=false;setPrev(false);syncPrevSvg(false);}
     initAudio();therapyPlaying=true;
     seqLen=randSeqLen();currentSeq=randSeq(seqLen);seqPos=0;
     const WF=['sine','triangle','sawtooth','square'];
@@ -797,9 +908,10 @@ let noiseFreqHz=saved.noiseFreqHz||1000;
 document.querySelectorAll('.noise-pill').forEach(b=>b.classList.toggle('active',b.dataset.noise===noiseType));
 
 const NOISE_TYPES_STANDARD = ['white','pink','brown','blue','violet','grey'];
-const NOISE_TYPES_NATURE   = ['rain','ocean','wind','birds-synth'];
+const NOISE_TYPES_NATURE   = ['rain','ocean','wind','birds-synth','fire','binaural'];
 let noiseExtraNodes = []; // additional nodes for nature sounds
 let birdsTimer = null;
+let binauralOscL = null, binauralOscR = null;
 
 function isNatureSound(t){ return NOISE_TYPES_NATURE.includes(t); }
 
@@ -826,7 +938,7 @@ function buildNoiseBuffer(type){
   return buf;
 }
 
-const NOISE_FADE_IN=0.5,NOISE_FADE_OUT=0.3;
+const NOISE_FADE_IN=1.5,NOISE_FADE_OUT=0.3;
 
 
 
@@ -1043,6 +1155,126 @@ function startNatureGraph(type, gainNode) {
       birdsTimer = setTimeout(chirp, 400 + Math.random() * 2000);
     }
     chirp();
+  } else if (type==='fire') {
+    const rate=ctx.sampleRate;
+
+    // ── Layer 1: Combustion roar (the continuous "whoosh") ───────────────
+    // White noise bandpassed around 800-2500 Hz — the true sonic centre of fire
+    const src1=ctx.createBufferSource(); src1.buffer=buildNoiseBuffer('white'); src1.loop=true;
+    const bpf1=ctx.createBiquadFilter(); bpf1.type='bandpass'; bpf1.frequency.value=1100; bpf1.Q.value=0.35;
+    const roarG=ctx.createGain(); roarG.gain.value=0.55;
+    src1.connect(bpf1); bpf1.connect(roarG); roarG.connect(gainNode); src1.start();
+
+    // ── Layer 2: Air/brightness (high-frequency hiss of hot rising air) ──
+    const src2=ctx.createBufferSource(); src2.buffer=buildNoiseBuffer('white'); src2.loop=true;
+    const hpf=ctx.createBiquadFilter(); hpf.type='highpass'; hpf.frequency.value=3500;
+    const airG=ctx.createGain(); airG.gain.value=0.12;
+    src2.connect(hpf); hpf.connect(airG); airG.connect(gainNode); src2.start();
+
+    // ── Layer 3: Warm low-mid body ────────────────────────────────────────
+    const src3=ctx.createBufferSource(); src3.buffer=buildNoiseBuffer('pink'); src3.loop=true;
+    const bpf2=ctx.createBiquadFilter(); bpf2.type='bandpass'; bpf2.frequency.value=320; bpf2.Q.value=0.6;
+    const bodyG=ctx.createGain(); bodyG.gain.value=0.22;
+    src3.connect(bpf2); bpf2.connect(bodyG); bodyG.connect(gainNode); src3.start();
+
+    // ── "Breathing" LFO (0.08–0.18 Hz) ──────────────────────────────────
+    // Simulates air being drawn into and expelled from the fire
+    const lfo=ctx.createOscillator(); lfo.type='sine'; lfo.frequency.value=0.11+Math.random()*0.07;
+    const lfoG=ctx.createGain(); lfoG.gain.value=0.18;
+    lfo.connect(lfoG); lfoG.connect(roarG.gain); lfo.start();
+
+    // ── Sharp crackles (wood fibres snapping) ─────────────────────────────
+    // Very short attack (<1 ms), very fast decay — the defining sound of fire
+    let crackleTimer=null;
+    function scheduleCrackle(){
+      if(!noisePlaying) return;
+      const now=ctx.currentTime;
+      const freq=1800+Math.random()*6000;       // 1.8–7.8 kHz
+      const attack=0.0004+Math.random()*0.0008; // sub-millisecond snap
+      const decay =0.004+Math.random()*0.018;   // very fast die-off
+      const peak  =0.15+Math.random()*0.35;
+      const sz=Math.floor(rate*0.04);
+      const buf=ctx.createBuffer(1,sz,rate); const d=buf.getChannelData(0);
+      for(let i=0;i<sz;i++) d[i]=Math.random()*2-1;
+      const s=ctx.createBufferSource(); s.buffer=buf;
+      const f=ctx.createBiquadFilter(); f.type='bandpass'; f.frequency.value=freq; f.Q.value=8;
+      const g=ctx.createGain();
+      g.gain.setValueAtTime(0,now);
+      g.gain.linearRampToValueAtTime(peak,now+attack);
+      g.gain.setTargetAtTime(0,now+attack,decay);
+      s.connect(f); f.connect(g); g.connect(gainNode);
+      s.start(); s.stop(now+0.06);
+      // Occasionally fire two crackles in quick succession (a micro-burst)
+      if(Math.random()<0.25){
+        const now2=now+0.008+Math.random()*0.02;
+        const freq2=1500+Math.random()*5000;
+        const sz2=Math.floor(rate*0.03);
+        const buf2=ctx.createBuffer(1,sz2,rate); const d2=buf2.getChannelData(0);
+        for(let i=0;i<sz2;i++) d2[i]=Math.random()*2-1;
+        const s2=ctx.createBufferSource(); s2.buffer=buf2;
+        const f2=ctx.createBiquadFilter(); f2.type='bandpass'; f2.frequency.value=freq2; f2.Q.value=7;
+        const g2=ctx.createGain();
+        g2.gain.setValueAtTime(0,now2);
+        g2.gain.linearRampToValueAtTime(peak*0.6,now2+attack);
+        g2.gain.setTargetAtTime(0,now2+attack,decay*0.7);
+        s2.connect(f2); f2.connect(g2); g2.connect(gainNode);
+        s2.start(); s2.stop(now2+0.05);
+      }
+      crackleTimer=setTimeout(scheduleCrackle, 18+Math.random()*120);
+    }
+
+    // ── Occasional deep wood pops (trapped gas pockets bursting) ──────────
+    let popTimer=null;
+    function schedulePop(){
+      if(!noisePlaying) return;
+      const now=ctx.currentTime;
+      const freq=120+Math.random()*380;         // 120–500 Hz thud
+      const attack=0.001+Math.random()*0.002;
+      const decay =0.04+Math.random()*0.09;
+      const peak  =0.35+Math.random()*0.45;
+      const sz=Math.floor(rate*0.3);
+      const buf=ctx.createBuffer(1,sz,rate); const d=buf.getChannelData(0);
+      for(let i=0;i<sz;i++) d[i]=Math.random()*2-1;
+      const s=ctx.createBufferSource(); s.buffer=buf;
+      const f=ctx.createBiquadFilter(); f.type='bandpass'; f.frequency.value=freq; f.Q.value=2;
+      const g=ctx.createGain();
+      g.gain.setValueAtTime(0,now);
+      g.gain.linearRampToValueAtTime(peak,now+attack);
+      g.gain.setTargetAtTime(0,now+attack,decay);
+      s.connect(f); f.connect(g); g.connect(gainNode);
+      s.start(); s.stop(now+0.4);
+      popTimer=setTimeout(schedulePop, 500+Math.random()*2500);
+    }
+
+    scheduleCrackle(); schedulePop();
+    nodes.push({stop:()=>{
+      if(crackleTimer){clearTimeout(crackleTimer);crackleTimer=null;}
+      if(popTimer){clearTimeout(popTimer);popTimer=null;}
+    }});
+    nodes.push(src1,src2,src3,lfo,lfoG,hpf,bpf1,bpf2,roarG,airG,bodyG);
+
+  } else if (type==='binaural') {
+    const beatHz=parseFloat(document.getElementById('binaural-beat-sl').value)||10;
+    const carrierHz=parseInt(document.getElementById('binaural-carrier-sl').value)||200;
+
+    // Per-oscillator gain envelopes ensure a clean fade even if shared gainNode
+    // has already partially ramped — eliminates any click on start
+    const envL=ctx.createGain(); envL.gain.setValueAtTime(0,ctx.currentTime); envL.gain.linearRampToValueAtTime(1,ctx.currentTime+2.5);
+    const envR=ctx.createGain(); envR.gain.setValueAtTime(0,ctx.currentTime); envR.gain.linearRampToValueAtTime(1,ctx.currentTime+2.5);
+
+    // Left ear: carrier; Right ear: carrier + beat — perceived as a pulsing beat
+    const oscL=ctx.createOscillator(); oscL.type='sine'; oscL.frequency.value=carrierHz;
+    const oscR=ctx.createOscillator(); oscR.type='sine'; oscR.frequency.value=carrierHz+beatHz;
+
+    const panL=ctx.createStereoPanner(); panL.pan.value=-1;
+    const panR=ctx.createStereoPanner(); panR.pan.value=1;
+
+    oscL.connect(envL); envL.connect(panL); panL.connect(gainNode);
+    oscR.connect(envR); envR.connect(panR); panR.connect(gainNode);
+    oscL.start(); oscR.start();
+
+    binauralOscL=oscL; binauralOscR=oscR;
+    nodes.push(oscL,oscR,panL,panR,envL,envR);
   }
   return nodes;
 }
@@ -1079,6 +1311,7 @@ function stopNoise(){
   if(birdsTimer){clearTimeout(birdsTimer);birdsTimer=null;}
   if(noiseRandTimer){clearTimeout(noiseRandTimer);noiseRandTimer=null;}
   noiseSource=null; noiseFilter=null; noiseGainNode=null; noiseExtraNodes=[];
+  binauralOscL=null; binauralOscR=null;
   noisePlaying=false; setNoise(false);
 }
 noiseBtn.addEventListener('click',()=>{if(noisePlaying)stopNoise();else startNoise();});
@@ -1090,29 +1323,32 @@ document.querySelectorAll('.noise-pill').forEach(btn=>{
     // Hide frequency slider for nature sounds (it doesn't apply)
     const freqRow=document.getElementById('noise-freq-row');
     if(freqRow) freqRow.style.display=isNatureSound(noiseType)?'none':'flex';
+    // Show binaural controls only when binaural is selected
+    const binCtrl=document.getElementById('binaural-controls');
+    if(binCtrl) binCtrl.style.display=noiseType==='binaural'?'block':'none';
     if(noisePlaying){stopNoise();startNoise();}
     saveSettings();
   });
 });
 const noiseVolSl=document.getElementById('noise-vol');
 noiseVolSl.value=Math.round(noiseVol*100);
-setTrack(noiseVolSl,noiseVolSl.value,P,T);
+setTrack(noiseVolSl,noiseVolSl.value,AF,AT);
 document.getElementById('noise-vol-lbl').textContent=noiseVolSl.value+'%';
 noiseVolSl.addEventListener('input',()=>{
   noiseVol=noiseVolSl.value/100;
   document.getElementById('noise-vol-lbl').textContent=noiseVolSl.value+'%';
-  setTrack(noiseVolSl,noiseVolSl.value,P,T);
+  setTrack(noiseVolSl,noiseVolSl.value,AF,AT);
   if(noiseGainNode)noiseGainNode.gain.setTargetAtTime(noiseVol,ctx.currentTime,0.015);
   saveSettings();
 });
 const noiseFreqSl=document.getElementById('noise-freq-sl');
 noiseFreqSl.value=noiseFreqHz;
-setTrack(noiseFreqSl,((noiseFreqHz-100)/(12000-100)*100).toFixed(2),P,T);
+setTrack(noiseFreqSl,((noiseFreqHz-100)/(12000-100)*100).toFixed(2),AF,AT);
 document.getElementById('noise-freq-lbl').textContent=fmtHz(noiseFreqHz);
 noiseFreqSl.addEventListener('input',()=>{
   noiseFreqHz=parseInt(noiseFreqSl.value);
   document.getElementById('noise-freq-lbl').textContent=fmtHz(noiseFreqHz);
-  setTrack(noiseFreqSl,((noiseFreqHz-100)/(12000-100)*100).toFixed(2),P,T);
+  setTrack(noiseFreqSl,((noiseFreqHz-100)/(12000-100)*100).toFixed(2),AF,AT);
   if(noiseFilter)noiseFilter.frequency.setTargetAtTime(noiseFreqHz,ctx.currentTime,0.02);
   saveSettings();
 });
@@ -1122,9 +1358,9 @@ let noiseRandTimer = null;
 
 // Speed presets: [rampMin, rampMax, holdMin, holdMax] in seconds/ms
 const NOISE_SPEEDS = [
-  { label:'Mild',       rampMin:2.0, rampMax:5.0, holdMin:2000, holdMax:5000 },
-  { label:'Medium',     rampMin:0.8, rampMax:2.5, holdMin:500,  holdMax:2500 },
-  { label:'Aggressive', rampMin:0.15,rampMax:0.6, holdMin:100,  holdMax:700  },
+  { label:'Mild',       rampMin:0.6, rampMax:1.8, holdMin:700,  holdMax:2200 },
+  { label:'Medium',     rampMin:0.2, rampMax:0.7, holdMin:150,  holdMax:700  },
+  { label:'Aggressive', rampMin:0.04,rampMax:0.15,holdMin:30,   holdMax:180  },
 ];
 
 function getNoiseSpeed() {
@@ -1189,6 +1425,58 @@ seqBreakSl.addEventListener('input',()=>{
   document.getElementById('seq-break-lbl').textContent=lbl;
   setTrack(seqBreakSl,(seqBreakMs/5000*100).toFixed(1),P,T);
   saveSettings();
+});
+
+// ── Binaural controls ──────────────────────────────────────────────────────
+const binBeatSl=document.getElementById('binaural-beat-sl');
+const binCarrierSl=document.getElementById('binaural-carrier-sl');
+setTrack(binBeatSl,((10-1)/(40-1)*100).toFixed(1),P,T);
+setTrack(binCarrierSl,((200-80)/(500-80)*100).toFixed(1),P,T);
+
+function updateBeatLabels(){
+  const v=parseFloat(binBeatSl.value);
+  document.querySelectorAll('.beat-lbl').forEach(lbl=>{
+    const lv=parseFloat(lbl.dataset.beat);
+    const active=v===lv;
+    lbl.style.color=active?'var(--primary)':'var(--muted)';
+    lbl.style.fontWeight=active?'600':'400';
+  });
+}
+
+binBeatSl.addEventListener('input',()=>{
+  const v=parseFloat(binBeatSl.value);
+  document.getElementById('binaural-beat-lbl').textContent=v+' Hz';
+  setTrack(binBeatSl,((v-1)/(40-1)*100).toFixed(1),P,T);
+  updateBeatLabels();
+  if(binauralOscR&&noisePlaying){
+    const carrier=parseInt(binCarrierSl.value);
+    binauralOscR.frequency.setTargetAtTime(carrier+v,ctx.currentTime,0.1);
+  }
+});
+
+binCarrierSl.addEventListener('input',()=>{
+  const carrier=parseInt(binCarrierSl.value);
+  const beat=parseFloat(binBeatSl.value);
+  document.getElementById('binaural-carrier-lbl').textContent=carrier+' Hz';
+  setTrack(binCarrierSl,((carrier-80)/(500-80)*100).toFixed(1),P,T);
+  if(binauralOscL&&binauralOscR&&noisePlaying){
+    binauralOscL.frequency.setTargetAtTime(carrier,ctx.currentTime,0.1);
+    binauralOscR.frequency.setTargetAtTime(carrier+beat,ctx.currentTime,0.1);
+  }
+});
+
+document.querySelectorAll('.beat-lbl').forEach(lbl=>{
+  lbl.addEventListener('click',()=>{
+    const v=parseFloat(lbl.dataset.beat);
+    binBeatSl.value=v;
+    document.getElementById('binaural-beat-lbl').textContent=v+' Hz';
+    setTrack(binBeatSl,((v-1)/(40-1)*100).toFixed(1),P,T);
+    updateBeatLabels();
+    if(binauralOscR&&noisePlaying){
+      const carrier=parseInt(binCarrierSl.value);
+      binauralOscR.frequency.setTargetAtTime(carrier+v,ctx.currentTime,0.1);
+    }
+  });
 });
 
 // ── Onboarding ─────────────────────────────────────────────────────────────
