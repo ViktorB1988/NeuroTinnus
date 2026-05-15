@@ -111,7 +111,7 @@ body{
 .card.noise-card{border-width:1.5px;border-color:var(--noise-border);background:var(--noise-card)}
 .section-lbl{font-size:10px;font-weight:600;color:var(--section-label);text-transform:uppercase;letter-spacing:0.8px;padding:0 3px}
 
-input[type=range]:disabled{opacity:0.35;cursor:not-allowed;}
+input[type=range]:disabled{opacity:0.15;cursor:not-allowed;}
 input[type=range]:disabled::-webkit-slider-thumb{cursor:not-allowed;}
 input[type=range]:disabled::-moz-range-thumb{cursor:not-allowed;}
 .arc-card{background:var(--card);border-radius:16px;padding:14px 15px 10px;border:0.5px solid var(--border);text-align:center}
@@ -176,7 +176,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 .noise-pill.active{background:var(--primary);border-color:var(--primary);color:#fff}
 
 /* ── Tone/settings panels ────────────────────────────────────────────────── */
-.therapy-row{display:flex;align-items:center;gap:8px;padding:7px 3px;border-radius:10px;transition:background 0.2s}
+.therapy-row{display:flex;flex-direction:column;gap:2px;padding:7px 3px;border-radius:10px;transition:background 0.2s}
 .therapy-row.playing{background:var(--playing)}
 .therapy-num{font-size:12px;font-weight:500;color:var(--label);width:14px;text-align:center;flex-shrink:0}
 .therapy-freq{font-size:10px;color:var(--muted);min-width:80px;text-align:right;flex-shrink:0}
@@ -440,11 +440,9 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px">
           <button class="noise-pill" data-noise="rain">🌧 Rain</button>
-          <button class="noise-pill" data-noise="ocean">🌊 Ocean</button>
+          <button class="noise-pill" data-noise="ocean">🌊 Deep underwater</button>
           <button class="noise-pill" data-noise="wind">🍃 Wind</button>
-          <button class="noise-pill" data-noise="birds-synth">🐦 Birds - synth</button>
-          <button class="noise-pill" data-noise="birds-real">🐦 Birds - real</button>
-          <button class="noise-pill" data-noise="fire">🔥 Fire</button>
+          <button class="noise-pill" data-noise="birds-synth">🐦 Birds</button>
         </div>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
           <div style="height:0.5px;background:var(--border);flex:1"></div>
@@ -452,14 +450,15 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
           <div style="height:0.5px;background:var(--border);flex:1"></div>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px">
-          <button class="noise-pill" data-noise="binaural">🎵 Binaural</button>
+          <button class="noise-pill" data-noise="binaural">🎵 Binaural (use with headphones)</button>
+          <button class="noise-pill" data-noise="isochronic">🔔 Isochronic</button>
         </div>
 
         <div class="check-row">
           <input type="checkbox" id="rand-noise-vol">
           <label for="rand-noise-vol">Randomize volume</label>
         </div>
-        <div style="margin-top:10px;transition:opacity 0.2s" id="noise-speed-row">
+        <div style="margin-top:10px;transition:opacity 0.2s;opacity:0.2" id="noise-speed-row">
           <input type="range" id="noise-speed-sl" min="0" max="2" step="1" value="1" disabled style="width:100%;margin-bottom:10px">
           <div style="display:flex;justify-content:space-between">
             <span class="speed-lbl" data-val="0" style="font-size:10px;cursor:pointer;color:var(--muted)">Mild</span>
@@ -687,12 +686,22 @@ const rowEls=[];
 OFF_L.forEach((lbl,i)=>{
   if(i>0){const d=document.createElement('div');d.className='divider';rowsEl.appendChild(d);}
   const row=document.createElement('div');row.className='therapy-row';
-  row.innerHTML=`<span class="therapy-num">${i+1}</span><input type="range" min="0" max="100" step="1" value="${Math.round(volValues[i]*100)}" style="flex:1"><span class="therapy-freq" id="tl${i}"></span>`;
+  const initPct=Math.round(volValues[i]*100);
+  row.innerHTML=`
+    <div style="display:flex;align-items:center;gap:8px;width:100%">
+      <span class="therapy-num">${i+1}</span>
+      <input type="range" min="0" max="100" step="1" value="${initPct}" style="flex:1">
+      <span class="vol-val" id="tv${i}" style="min-width:34px;text-align:right">${initPct}%</span>
+    </div>
+    <div style="padding-left:22px">
+      <span class="therapy-freq" id="tl${i}"></span>
+    </div>`;
   rowsEl.appendChild(row);
   const vsl=row.querySelector('input');
-  setTrack(vsl,Math.round(volValues[i]*100),P,T);
+  setTrack(vsl,initPct,P,T);
   vsl.addEventListener('input',()=>{
     volValues[i]=vsl.value/100;setTrack(vsl,vsl.value,P,T);
+    document.getElementById('tv'+i).textContent=vsl.value+'%';
     if(currentOscGain&&therapyPlaying&&seqPos>0&&currentSeq[seqPos-1]===i)
       currentOscGain.gain.setTargetAtTime(volValues[i],ctx.currentTime,0.015);
     saveSettings();
@@ -808,10 +817,11 @@ let noiseFreqHz=saved.noiseFreqHz||1000;
 document.querySelectorAll('.noise-pill').forEach(b=>b.classList.toggle('active',b.dataset.noise===noiseType));
 
 const NOISE_TYPES_STANDARD = ['white','pink','brown','blue','violet','grey'];
-const NOISE_TYPES_NATURE   = ['rain','ocean','wind','birds-synth','birds-real','fire','binaural'];
+const NOISE_TYPES_NATURE   = ['rain','ocean','wind','birds-synth','binaural','isochronic'];
 let noiseExtraNodes = []; // additional nodes for nature sounds
 let birdsTimer = null;
 let binauralOscL = null, binauralOscR = null;
+let isochronicOsc = null, isochronicLfo = null;
 
 function isNatureSound(t){ return NOISE_TYPES_NATURE.includes(t); }
 
@@ -848,141 +858,246 @@ function startNatureGraph(type, gainNode) {
   if (type==='rain') {
     const rate=ctx.sampleRate;
 
-    // All layers feed a pre-output gain so we can add a shared delay
-    const pre=ctx.createGain(); pre.gain.value=1; pre.connect(gainNode);
+    // ── Design philosophy ────────────────────────────────────────────────────
+    // Real rain is NOT noise. It is thousands of overlapping individual water
+    // impacts, each producing a short transient with a characteristic spectral
+    // shape. The perceived "hiss" is the sum of those impacts at high density.
+    //
+    // Spectral profile of real rain (measured):
+    //   - Peak energy: 1–5 kHz  (surface tension splash)
+    //   - Secondary:  100–400 Hz (air-cavity resonance inside the drop)
+    //   - Sharp rolloff above 10 kHz; almost nothing below 80 Hz
+    //
+    // Strategy: dense scheduled transients across three size classes, plus a
+    // thin shaped-noise bed representing their collective sum.
+    // No modulators touching gain AudioParams — avoids additive spikes.
 
-    // ── Layer 1: Base hiss ───────────────────────────────────────────────
-    // White noise → HPF (removes rumble) → LPF (softens extreme hiss)
-    const src1=ctx.createBufferSource(); src1.buffer=buildNoiseBuffer('white'); src1.loop=true;
-    const hpf=ctx.createBiquadFilter(); hpf.type='highpass'; hpf.frequency.value=250;
-    const lpf=ctx.createBiquadFilter(); lpf.type='lowpass';  lpf.frequency.value=8500;
-    const hissG=ctx.createGain(); hissG.gain.value=0.55;
-    src1.connect(hpf); hpf.connect(lpf); lpf.connect(hissG); hissG.connect(pre);
+    // ── Layer A: Shaped-noise bed (collective impact hiss) ───────────────────
+    const bedSrc=ctx.createBufferSource();
+    bedSrc.buffer=buildNoiseBuffer('pink'); bedSrc.loop=true;
+    const bedHpf=ctx.createBiquadFilter(); bedHpf.type='highpass'; bedHpf.frequency.value=700;  bedHpf.Q.value=0.5;
+    const bedPk =ctx.createBiquadFilter(); bedPk.type='peaking';   bedPk.frequency.value=2500;  bedPk.Q.value=1.1; bedPk.gain.value=7;
+    const bedLpf=ctx.createBiquadFilter(); bedLpf.type='lowpass';  bedLpf.frequency.value=9000; bedLpf.Q.value=0.6;
+    const bedG  =ctx.createGain(); bedG.gain.value=0.18;
+    bedSrc.connect(bedHpf); bedHpf.connect(bedPk); bedPk.connect(bedLpf); bedLpf.connect(bedG); bedG.connect(gainNode);
+    bedSrc.start();
+
+    // ── Layer B: Low air-cavity resonance ───────────────────────────────────
+    // Real drops trap an air bubble on impact (100–400 Hz resonance).
+    const cavSrc=ctx.createBufferSource();
+    cavSrc.buffer=buildNoiseBuffer('brown'); cavSrc.loop=true;
+    const cavBpf=ctx.createBiquadFilter(); cavBpf.type='bandpass'; cavBpf.frequency.value=220; cavBpf.Q.value=1.8;
+    const cavG  =ctx.createGain(); cavG.gain.value=0.10;
+    cavSrc.connect(cavBpf); cavBpf.connect(cavG); cavG.connect(gainNode);
+    cavSrc.start();
+
+    // ── Layer C: Short room tail ─────────────────────────────────────────────
+    const del1=ctx.createDelay(0.1); del1.delayTime.value=0.018;
+    const del2=ctx.createDelay(0.1); del2.delayTime.value=0.041;
+    const dg1 =ctx.createGain(); dg1.gain.value=0.09;
+    const dg2 =ctx.createGain(); dg2.gain.value=0.06;
+    bedG.connect(del1); del1.connect(dg1); dg1.connect(gainNode);
+    bedG.connect(del2); del2.connect(dg2); dg2.connect(gainNode);
+
+    // ── Layer D: Scheduled transients — three size classes ───────────────────
+    let dtA=null,dtB=null,dtC=null;
+
+    // Pool buffer — pre-allocated, avoids GC pressure from many short buffers
+    const poolBuf=ctx.createBuffer(1,Math.floor(rate*0.12),rate);
+    (()=>{const d=poolBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;})();
+
+    function fireTransient(freqHz,Q,peakGain,attackSec,decayTC){
+      if(!noisePlaying)return;
+      const now=ctx.currentTime;
+      const src=ctx.createBufferSource(); src.buffer=poolBuf;
+      const flt=ctx.createBiquadFilter(); flt.type='bandpass';
+      flt.frequency.value=freqHz; flt.Q.value=Q;
+      const env=ctx.createGain();
+      env.gain.setValueAtTime(0,now);
+      env.gain.linearRampToValueAtTime(peakGain,now+attackSec);
+      env.gain.setTargetAtTime(0,now+attackSec,decayTC);
+      src.connect(flt); flt.connect(env); env.connect(gainNode);
+      src.start(); src.stop(now+0.12);
+    }
+
+    // Class 1 — Fine drops (frequent, high-freq, very short decay)
+    function fineDrop(){
+      if(!noisePlaying)return;
+      fireTransient(
+        2200+Math.random()*2800,
+        3.5+Math.random()*2,
+        0.06+Math.random()*0.09,
+        0.001+Math.random()*0.002,
+        0.008+Math.random()*0.012
+      );
+      dtA=setTimeout(fineDrop,18+Math.random()*55);
+    }
+
+    // Class 2 — Medium drops (splash + air bubble)
+    function medDrop(){
+      if(!noisePlaying)return;
+      fireTransient(900+Math.random()*1100, 2.0+Math.random()*1.5,
+        0.10+Math.random()*0.12, 0.002+Math.random()*0.003, 0.020+Math.random()*0.030);
+      fireTransient(120+Math.random()*180, 4.0+Math.random()*2,
+        0.07+Math.random()*0.08, 0.003+Math.random()*0.003, 0.025+Math.random()*0.035);
+      dtB=setTimeout(medDrop,120+Math.random()*280);
+    }
+
+    // Class 3 — Large drops (broad splash + deep thud, rare)
+    function largeDrop(){
+      if(!noisePlaying)return;
+      fireTransient(500+Math.random()*700,  1.2+Math.random()*0.8,
+        0.18+Math.random()*0.18, 0.003+Math.random()*0.004, 0.045+Math.random()*0.055);
+      fireTransient(80+Math.random()*120,   2.5+Math.random()*1.5,
+        0.14+Math.random()*0.14, 0.004+Math.random()*0.004, 0.060+Math.random()*0.070);
+      dtC=setTimeout(largeDrop,600+Math.random()*1400);
+    }
+
+    fineDrop(); medDrop(); largeDrop();
+
+    nodes.push({stop:()=>{
+      if(dtA){clearTimeout(dtA);dtA=null;}
+      if(dtB){clearTimeout(dtB);dtB=null;}
+      if(dtC){clearTimeout(dtC);dtC=null;}
+    }});
+    nodes.push(bedSrc,cavSrc,bedHpf,bedPk,bedLpf,bedG,cavBpf,cavG,del1,del2,dg1,dg2);
+  } else if (type==='ocean') {
+    const rate=ctx.sampleRate;
+
+    // Deep underwater: water absorbs almost all high frequencies — almost nothing
+    // above 200 Hz reaches the ear. What you hear is sub-bass pressure, slow massive
+    // movement, muffled resonances, and occasional low structural groans.
+
+    // ── Layer 1: Deep pressure rumble ────────────────────────────────────────
+    // Brown noise through aggressive lowpass — models the omnidirectional
+    // low-frequency pressure field of deep water.
+    const rumbleSrc=ctx.createBufferSource(); rumbleSrc.buffer=buildNoiseBuffer('brown'); rumbleSrc.loop=true;
+    const rumbleLpf=ctx.createBiquadFilter(); rumbleLpf.type='lowpass'; rumbleLpf.frequency.value=80;
+    const rumbleG=ctx.createGain(); rumbleG.gain.value=0.7;
+    rumbleSrc.connect(rumbleLpf); rumbleLpf.connect(rumbleG); rumbleG.connect(gainNode);
+    rumbleSrc.start();
+
+    // ── Layer 2: Muffled mid wash ────────────────────────────────────────────
+    // Pink noise bandpassed very tightly around 120–180 Hz — the only mid content
+    // that survives at depth. Very quiet, just adds a slight sense of space.
+    const washSrc=ctx.createBufferSource(); washSrc.buffer=buildNoiseBuffer('pink'); washSrc.loop=true;
+    const washBpf=ctx.createBiquadFilter(); washBpf.type='bandpass'; washBpf.frequency.value=150; washBpf.Q.value=1.2;
+    const washG=ctx.createGain(); washG.gain.value=0.18;
+    washSrc.connect(washBpf); washBpf.connect(washG); washG.connect(gainNode);
+    washSrc.start();
+
+    // ── Layer 3: Massive slow swell ──────────────────────────────────────────
+    // Very slow LFO (one cycle ≈ 20s) swells the rumble gain — models the feeling
+    // of huge pressure waves passing through the body.
+    const swellLfo=ctx.createOscillator(); swellLfo.type='sine'; swellLfo.frequency.value=0.05;
+    const swellLfoG=ctx.createGain(); swellLfoG.gain.value=0.28;
+    swellLfo.connect(swellLfoG); swellLfoG.connect(rumbleG.gain);
+    swellLfo.start();
+
+    // ── Layer 4: Long reverb — underwater resonance ──────────────────────────
+    // Deep water has an enormous reverb tail (seconds). Simulated with two long
+    // delays feeding back into each other very gently.
+    const del1=ctx.createDelay(1.5); del1.delayTime.value=0.9;
+    const del2=ctx.createDelay(1.5); del2.delayTime.value=1.3;
+    const fb1=ctx.createGain(); fb1.gain.value=0.35;
+    const fb2=ctx.createGain(); fb2.gain.value=0.28;
+    const revLpf1=ctx.createBiquadFilter(); revLpf1.type='lowpass'; revLpf1.frequency.value=120;
+    const revLpf2=ctx.createBiquadFilter(); revLpf2.type='lowpass'; revLpf2.frequency.value=120;
+    // Signal chain: rumble → del1 → lpf1 → fb1 → gainNode
+    //                             └→ del2 → lpf2 → fb2 → gainNode
+    rumbleG.connect(del1); del1.connect(revLpf1); revLpf1.connect(fb1); fb1.connect(gainNode);
+    rumbleG.connect(del2); del2.connect(revLpf2); revLpf2.connect(fb2); fb2.connect(gainNode);
+
+    // ── Layer 5: Structural groans ───────────────────────────────────────────
+    // Occasional very low sine sweeps (30–90 Hz) model distant pressure creaks —
+    // the sound deep-water divers and submarine crews describe.
+    let groanTimer=null;
+    function scheduleGroan(){
+      if(!noisePlaying)return;
+      const now=ctx.currentTime;
+      const dur=2.5+Math.random()*4.0;
+      const startFreq=28+Math.random()*35;
+      const endFreq=startFreq*(Math.random()<0.5?0.6:1.5);
+      const osc=ctx.createOscillator(); osc.type='sine';
+      osc.frequency.setValueAtTime(startFreq,now);
+      osc.frequency.linearRampToValueAtTime(endFreq,now+dur);
+      const env=ctx.createGain();
+      env.gain.setValueAtTime(0,now);
+      env.gain.linearRampToValueAtTime(0.18+Math.random()*0.14,now+dur*0.3);
+      env.gain.linearRampToValueAtTime(0,now+dur);
+      osc.connect(env); env.connect(gainNode);
+      osc.start(now); osc.stop(now+dur+0.05);
+      groanTimer=setTimeout(scheduleGroan,4000+Math.random()*12000);
+    }
+    scheduleGroan();
+
+    nodes.push({stop:()=>{if(groanTimer){clearTimeout(groanTimer);groanTimer=null;}}});
+    nodes.push(rumbleSrc,washSrc,swellLfo,swellLfoG,rumbleLpf,rumbleG,washBpf,washG,del1,del2,revLpf1,revLpf2,fb1,fb2);
+  } else if (type==='wind') {
+    const rate=ctx.sampleRate;
+
+    // ── Layer 1: Base whoosh ─────────────────────────────────────────────────
+    // Pink noise bandpassed around 350–700 Hz — the core "air moving" texture.
+    const src1=ctx.createBufferSource(); src1.buffer=buildNoiseBuffer('pink'); src1.loop=true;
+    const bpf1=ctx.createBiquadFilter(); bpf1.type='bandpass'; bpf1.frequency.value=480; bpf1.Q.value=0.8;
+    const whooshG=ctx.createGain(); whooshG.gain.value=0; // driven entirely by gustSrc
+    src1.connect(bpf1); bpf1.connect(whooshG); whooshG.connect(gainNode);
     src1.start();
 
-    // ── Layer 2: Drop texture ────────────────────────────────────────────
-    // White noise bandpassed around the "patter" frequency range,
-    // amplitude-modulated by a fast noise buffer so it sounds like
-    // many overlapping drops rather than a smooth hiss.
+    // ── Layer 2: High whistle — air through gaps ─────────────────────────────
+    // Narrower bandpass 1.5–3 kHz, low volume — the high-pitched component of wind.
     const src2=ctx.createBufferSource(); src2.buffer=buildNoiseBuffer('white'); src2.loop=true;
-    const bpf=ctx.createBiquadFilter(); bpf.type='bandpass'; bpf.frequency.value=1400; bpf.Q.value=0.6;
-    const texG=ctx.createGain(); texG.gain.value=0;  // driven by modulator
+    const bpf2=ctx.createBiquadFilter(); bpf2.type='bandpass'; bpf2.frequency.value=2200; bpf2.Q.value=2.5;
+    const whistleG=ctx.createGain(); whistleG.gain.value=0.12;
+    src2.connect(bpf2); bpf2.connect(whistleG); whistleG.connect(gainNode);
+    src2.start();
 
-    // Fast modulation buffer: rectified random walk (≈8ms time constant)
-    // gives a positive-only signal that feels like a dense stream of drops
-    const modSz=rate*3;
-    const modBuf=ctx.createBuffer(1,modSz,rate); const md=modBuf.getChannelData(0);
-    let mL=0;
-    for(let i=0;i<modSz;i++){const w=Math.random()*2-1;mL=mL*0.985+w*0.015;md[i]=Math.abs(mL);}
-    // Smooth loop seam
-    const bl=Math.min(2000,modSz/4);
-    for(let i=0;i<bl;i++){const t=i/bl;md[modSz-bl+i]=md[modSz-bl+i]*(1-t)+md[i]*t;}
-    const modSrc=ctx.createBufferSource(); modSrc.buffer=modBuf; modSrc.loop=true;
-    const modG=ctx.createGain(); modG.gain.value=0.45;
-    modSrc.connect(modG); modG.connect(texG.gain);
-    src2.connect(bpf); bpf.connect(texG); texG.connect(pre);
-    src2.start(); modSrc.start();
-
-    // ── Layer 3: Low body ────────────────────────────────────────────────
-    // Brown noise → aggressive lowpass gives a subtle low-frequency weight
+    // ── Layer 3: Low rumble — air mass ───────────────────────────────────────
     const src3=ctx.createBufferSource(); src3.buffer=buildNoiseBuffer('brown'); src3.loop=true;
-    const lpf2=ctx.createBiquadFilter(); lpf2.type='lowpass'; lpf2.frequency.value=220;
-    const bodyG=ctx.createGain(); bodyG.gain.value=0.18;
-    src3.connect(lpf2); lpf2.connect(bodyG); bodyG.connect(pre);
+    const lpf3=ctx.createBiquadFilter(); lpf3.type='lowpass'; lpf3.frequency.value=180;
+    const rumbleG=ctx.createGain(); rumbleG.gain.value=0; // driven entirely by gustSrc2
+    src3.connect(lpf3); lpf3.connect(rumbleG); rumbleG.connect(gainNode);
     src3.start();
 
-    // ── Shared delay (room reflection) ───────────────────────────────────
-    // Feeds from pre → delay → gainNode (parallel, not series)
-    const delay=ctx.createDelay(0.12); delay.delayTime.value=0.038;
-    const delG=ctx.createGain(); delG.gain.value=0.14;
-    pre.connect(delay); delay.connect(delG); delG.connect(gainNode);
+    // ── Layer 4: Slow frequency sweep ───────────────────────────────────────
+    // LFO sweeps the main bandpass centre — gives the "pitch" rise and fall of wind.
+    const sweepLfo=ctx.createOscillator(); sweepLfo.type='sine'; sweepLfo.frequency.value=0.06;
+    const sweepLfoG=ctx.createGain(); sweepLfoG.gain.value=200;
+    sweepLfo.connect(sweepLfoG); sweepLfoG.connect(bpf1.frequency);
+    sweepLfo.start();
 
-    // ── Slow intensity drift ─────────────────────────────────────────────
-    // Very slow random walk on the hiss gain for a natural "rainfall shifting" feel
-    const dSz=rate*10;
-    const dBuf=ctx.createBuffer(1,dSz,rate); const dd=dBuf.getChannelData(0);
-    let dL=0;
-    for(let i=0;i<dSz;i++){const w=Math.random()*2-1;dL=(dL+0.0002*w)/1.0002;dd[i]=dL;}
-    const bl2=Math.min(4000,dSz/4);
-    for(let i=0;i<bl2;i++){const t=i/bl2;dd[dSz-bl2+i]=dd[dSz-bl2+i]*(1-t)+dd[i]*t;}
-    const driftSrc=ctx.createBufferSource(); driftSrc.buffer=dBuf; driftSrc.loop=true;
-    const driftG=ctx.createGain(); driftG.gain.value=0.08;
-    driftSrc.connect(driftG); driftG.connect(gainNode.gain); driftSrc.start();
+    // Also sweep the whistle frequency slightly out of phase
+    const sweepLfo2=ctx.createOscillator(); sweepLfo2.type='sine'; sweepLfo2.frequency.value=0.04;
+    const sweepLfoG2=ctx.createGain(); sweepLfoG2.gain.value=600;
+    sweepLfo2.connect(sweepLfoG2); sweepLfoG2.connect(bpf2.frequency);
+    sweepLfo2.start();
 
-    // ── Individual drops ─────────────────────────────────────────────────
-    // Two sizes: frequent small drops (high freq) + occasional large drops (low freq)
-    // Fast attack + exponential decay = realistic water impact character
-    let dropTimer1=null, dropTimer2=null;
-
-    function scheduleSmallDrop(){
-      if(!noisePlaying)return;
-      const now=ctx.currentTime;
-      const freq=1800+Math.random()*3200;
-      const attack=0.002+Math.random()*0.004;
-      const decay=0.025+Math.random()*0.04;
-      const peak=0.12+Math.random()*0.18;
-
-      const dSz=Math.floor(rate*0.15);
-      const dBuf=ctx.createBuffer(1,dSz,rate),dd=dBuf.getChannelData(0);
-      for(let i=0;i<dSz;i++)dd[i]=Math.random()*2-1;
-      const dSrc=ctx.createBufferSource(); dSrc.buffer=dBuf;
-      const bpf=ctx.createBiquadFilter(); bpf.type='bandpass'; bpf.frequency.value=freq; bpf.Q.value=3.5;
-      const dg=ctx.createGain();
-      dg.gain.setValueAtTime(0,now);
-      dg.gain.linearRampToValueAtTime(peak,now+attack);
-      dg.gain.setTargetAtTime(0,now+attack,decay); // exponential decay
-      dSrc.connect(bpf);bpf.connect(dg);dg.connect(gainNode);
-      dSrc.start(); dSrc.stop(now+0.15);
-      dropTimer1=setTimeout(scheduleSmallDrop, 40+Math.random()*130);
+    // ── Layer 5: Irregular gusts ─────────────────────────────────────────────
+    // A pre-computed random-walk buffer drives the master whoosh gain non-periodically.
+    // Unlike a regular LFO, this never repeats — each gust has a unique shape and duration.
+    // gust buffer outputs absolute whoosh gain [0.15, 0.7] — base is 0, no additive spike.
+    const gustSz=rate*20;
+    const gustBuf=ctx.createBuffer(1,gustSz,rate); const gd=gustBuf.getChannelData(0);
+    let gL=0,gL2=0;
+    for(let i=0;i<gustSz;i++){
+      const w=Math.random()*2-1;
+      gL=gL*0.9992+w*0.0008;
+      gL2=gL2*0.998+w*0.002;
+      gd[i]=0.15+0.55*Math.max(0,Math.sin(gL*6+gL2*3)*0.5+0.5);
     }
+    const blg=Math.min(16000,gustSz/4);
+    for(let i=0;i<blg;i++){const t=i/blg; gd[gustSz-blg+i]=gd[gustSz-blg+i]*(1-t)+gd[i]*t;}
+    const gustSrc=ctx.createBufferSource(); gustSrc.buffer=gustBuf; gustSrc.loop=true;
+    gustSrc.connect(whooshG.gain);
+    // Rumble driven by same buffer at half speed, scaled to [0.05, 0.28]
+    const gustSrc2=ctx.createBufferSource(); gustSrc2.buffer=gustBuf;
+    gustSrc2.loop=true; gustSrc2.playbackRate.value=0.5;
+    const gustG2=ctx.createGain(); gustG2.gain.value=0.4;
+    gustSrc2.connect(gustG2); gustG2.connect(rumbleG.gain);
+    gustSrc.start(); gustSrc2.start(); // start immediately — master gainNode fade handles fade-in
 
-    function scheduleLargeDrop(){
-      if(!noisePlaying)return;
-      const now=ctx.currentTime;
-      const freq=350+Math.random()*700;
-      const attack=0.003+Math.random()*0.005;
-      const decay=0.06+Math.random()*0.08;
-      const peak=0.22+Math.random()*0.25;
-
-      const dSz=Math.floor(rate*0.35);
-      const dBuf=ctx.createBuffer(1,dSz,rate),dd=dBuf.getChannelData(0);
-      for(let i=0;i<dSz;i++)dd[i]=Math.random()*2-1;
-      const dSrc=ctx.createBufferSource(); dSrc.buffer=dBuf;
-      const bpf=ctx.createBiquadFilter(); bpf.type='bandpass'; bpf.frequency.value=freq; bpf.Q.value=2.0;
-      const dg=ctx.createGain();
-      dg.gain.setValueAtTime(0,now);
-      dg.gain.linearRampToValueAtTime(peak,now+attack);
-      dg.gain.setTargetAtTime(0,now+attack,decay);
-      dSrc.connect(bpf);bpf.connect(dg);dg.connect(gainNode);
-      dSrc.start(); dSrc.stop(now+0.35);
-      dropTimer2=setTimeout(scheduleLargeDrop, 200+Math.random()*600);
-    }
-
-    scheduleSmallDrop();
-    scheduleLargeDrop();
-    nodes.push({stop:()=>{
-      if(dropTimer1){clearTimeout(dropTimer1);dropTimer1=null;}
-      if(dropTimer2){clearTimeout(dropTimer2);dropTimer2=null;}
-    }});
-    nodes.push(src1,src2,src3,modSrc,driftSrc,hpf,lpf,lpf2,bpf,hissG,texG,bodyG,pre,delay,delG,modG,driftG);
-  } else if (type==='ocean') {
-    // Brown noise → lowpass 500Hz + very slow LFO (0.07Hz = ~14s wave cycle)
-    const src=ctx.createBufferSource(); src.buffer=buildNoiseBuffer('brown'); src.loop=true;
-    const lpf=ctx.createBiquadFilter(); lpf.type='lowpass'; lpf.frequency.value=500;
-    const lfo=ctx.createOscillator(); lfo.frequency.value=0.07;
-    const lfoG=ctx.createGain(); lfoG.gain.value=0.38;
-    lfo.connect(lfoG); lfoG.connect(gainNode.gain);
-    lfo.start(); src.connect(lpf); lpf.connect(gainNode); src.start();
-    nodes.push(src, lfo, lfoG, lpf);
-  } else if (type==='wind') {
-    // Pink noise → bandpass with sweeping frequency LFO (0.04Hz, ±250Hz around 550Hz)
-    const src=ctx.createBufferSource(); src.buffer=buildNoiseBuffer('pink'); src.loop=true;
-    const bpf=ctx.createBiquadFilter(); bpf.type='bandpass'; bpf.frequency.value=550; bpf.Q.value=1.2;
-    const lfo=ctx.createOscillator(); lfo.frequency.value=0.04;
-    const lfoG=ctx.createGain(); lfoG.gain.value=250;
-    lfo.connect(lfoG); lfoG.connect(bpf.frequency);
-    lfo.start(); src.connect(bpf); bpf.connect(gainNode); src.start();
-    nodes.push(src, lfo, lfoG, bpf);
+    nodes.push(src1,src2,src3,bpf1,bpf2,lpf3,whooshG,whistleG,rumbleG,
+               sweepLfo,sweepLfoG,sweepLfo2,sweepLfoG2,gustSrc,gustSrc2,gustG2);
   } else if (type==='birds-synth') {
     // Realistic birds: pitch-sweeping oscillators with vibrato, harmonics, and occasional trills
 
@@ -1055,127 +1170,6 @@ function startNatureGraph(type, gainNode) {
       birdsTimer = setTimeout(chirp, 400 + Math.random() * 2000);
     }
     chirp();
-  } else if (type==='birds-real') {
-    // Load via XHR + decodeAudioData — avoids the CORS restriction
-    // that createMediaElementSource triggers even for local files.
-    // Place the WAV alongside the HTML:
-    // 532232__shaunhillyard__early-birds-in-the-uk-2020.wav
-    let birdsSource = null;
-    const req = new XMLHttpRequest();
-    req.open('GET', './532232__shaunhillyard__early-birds-in-the-uk-2020.wav');
-    req.responseType = 'arraybuffer';
-    req.onload = () => {
-      if (!noisePlaying) return;
-      ctx.decodeAudioData(req.response).then(decoded => {
-        if (!noisePlaying) return;
-        birdsSource = ctx.createBufferSource();
-        birdsSource.buffer = decoded;
-        birdsSource.loop = true;
-        birdsSource.connect(gainNode);
-        birdsSource.start();
-      }).catch(e => console.warn('Birds-real: decode failed.', e));
-    };
-    req.onerror = () => console.warn('Birds-real: file not found. Place the WAV in the same folder as the HTML.');
-    req.send();
-    nodes.push({ stop: () => { try { if(birdsSource) birdsSource.stop(); } catch(e) {} birdsSource = null; } });
-  } else if (type==='fire') {
-    const rate=ctx.sampleRate;
-
-    // ── Layer 1: Combustion roar (the continuous "whoosh") ───────────────
-    // White noise bandpassed around 800-2500 Hz — the true sonic centre of fire
-    const src1=ctx.createBufferSource(); src1.buffer=buildNoiseBuffer('white'); src1.loop=true;
-    const bpf1=ctx.createBiquadFilter(); bpf1.type='bandpass'; bpf1.frequency.value=1100; bpf1.Q.value=0.35;
-    const roarG=ctx.createGain(); roarG.gain.value=0.55;
-    src1.connect(bpf1); bpf1.connect(roarG); roarG.connect(gainNode); src1.start();
-
-    // ── Layer 2: Air/brightness (high-frequency hiss of hot rising air) ──
-    const src2=ctx.createBufferSource(); src2.buffer=buildNoiseBuffer('white'); src2.loop=true;
-    const hpf=ctx.createBiquadFilter(); hpf.type='highpass'; hpf.frequency.value=3500;
-    const airG=ctx.createGain(); airG.gain.value=0.12;
-    src2.connect(hpf); hpf.connect(airG); airG.connect(gainNode); src2.start();
-
-    // ── Layer 3: Warm low-mid body ────────────────────────────────────────
-    const src3=ctx.createBufferSource(); src3.buffer=buildNoiseBuffer('pink'); src3.loop=true;
-    const bpf2=ctx.createBiquadFilter(); bpf2.type='bandpass'; bpf2.frequency.value=320; bpf2.Q.value=0.6;
-    const bodyG=ctx.createGain(); bodyG.gain.value=0.22;
-    src3.connect(bpf2); bpf2.connect(bodyG); bodyG.connect(gainNode); src3.start();
-
-    // ── "Breathing" LFO (0.08–0.18 Hz) ──────────────────────────────────
-    // Simulates air being drawn into and expelled from the fire
-    const lfo=ctx.createOscillator(); lfo.type='sine'; lfo.frequency.value=0.11+Math.random()*0.07;
-    const lfoG=ctx.createGain(); lfoG.gain.value=0.18;
-    lfo.connect(lfoG); lfoG.connect(roarG.gain); lfo.start();
-
-    // ── Sharp crackles (wood fibres snapping) ─────────────────────────────
-    // Very short attack (<1 ms), very fast decay — the defining sound of fire
-    let crackleTimer=null;
-    function scheduleCrackle(){
-      if(!noisePlaying) return;
-      const now=ctx.currentTime;
-      const freq=1800+Math.random()*6000;       // 1.8–7.8 kHz
-      const attack=0.0004+Math.random()*0.0008; // sub-millisecond snap
-      const decay =0.004+Math.random()*0.018;   // very fast die-off
-      const peak  =0.15+Math.random()*0.35;
-      const sz=Math.floor(rate*0.04);
-      const buf=ctx.createBuffer(1,sz,rate); const d=buf.getChannelData(0);
-      for(let i=0;i<sz;i++) d[i]=Math.random()*2-1;
-      const s=ctx.createBufferSource(); s.buffer=buf;
-      const f=ctx.createBiquadFilter(); f.type='bandpass'; f.frequency.value=freq; f.Q.value=8;
-      const g=ctx.createGain();
-      g.gain.setValueAtTime(0,now);
-      g.gain.linearRampToValueAtTime(peak,now+attack);
-      g.gain.setTargetAtTime(0,now+attack,decay);
-      s.connect(f); f.connect(g); g.connect(gainNode);
-      s.start(); s.stop(now+0.06);
-      // Occasionally fire two crackles in quick succession (a micro-burst)
-      if(Math.random()<0.25){
-        const now2=now+0.008+Math.random()*0.02;
-        const freq2=1500+Math.random()*5000;
-        const sz2=Math.floor(rate*0.03);
-        const buf2=ctx.createBuffer(1,sz2,rate); const d2=buf2.getChannelData(0);
-        for(let i=0;i<sz2;i++) d2[i]=Math.random()*2-1;
-        const s2=ctx.createBufferSource(); s2.buffer=buf2;
-        const f2=ctx.createBiquadFilter(); f2.type='bandpass'; f2.frequency.value=freq2; f2.Q.value=7;
-        const g2=ctx.createGain();
-        g2.gain.setValueAtTime(0,now2);
-        g2.gain.linearRampToValueAtTime(peak*0.6,now2+attack);
-        g2.gain.setTargetAtTime(0,now2+attack,decay*0.7);
-        s2.connect(f2); f2.connect(g2); g2.connect(gainNode);
-        s2.start(); s2.stop(now2+0.05);
-      }
-      crackleTimer=setTimeout(scheduleCrackle, 18+Math.random()*120);
-    }
-
-    // ── Occasional deep wood pops (trapped gas pockets bursting) ──────────
-    let popTimer=null;
-    function schedulePop(){
-      if(!noisePlaying) return;
-      const now=ctx.currentTime;
-      const freq=120+Math.random()*380;         // 120–500 Hz thud
-      const attack=0.001+Math.random()*0.002;
-      const decay =0.04+Math.random()*0.09;
-      const peak  =0.35+Math.random()*0.45;
-      const sz=Math.floor(rate*0.3);
-      const buf=ctx.createBuffer(1,sz,rate); const d=buf.getChannelData(0);
-      for(let i=0;i<sz;i++) d[i]=Math.random()*2-1;
-      const s=ctx.createBufferSource(); s.buffer=buf;
-      const f=ctx.createBiquadFilter(); f.type='bandpass'; f.frequency.value=freq; f.Q.value=2;
-      const g=ctx.createGain();
-      g.gain.setValueAtTime(0,now);
-      g.gain.linearRampToValueAtTime(peak,now+attack);
-      g.gain.setTargetAtTime(0,now+attack,decay);
-      s.connect(f); f.connect(g); g.connect(gainNode);
-      s.start(); s.stop(now+0.4);
-      popTimer=setTimeout(schedulePop, 500+Math.random()*2500);
-    }
-
-    scheduleCrackle(); schedulePop();
-    nodes.push({stop:()=>{
-      if(crackleTimer){clearTimeout(crackleTimer);crackleTimer=null;}
-      if(popTimer){clearTimeout(popTimer);popTimer=null;}
-    }});
-    nodes.push(src1,src2,src3,lfo,lfoG,hpf,bpf1,bpf2,roarG,airG,bodyG);
-
   } else if (type==='binaural') {
     const beatHz=parseFloat(document.getElementById('binaural-beat-sl').value)||10;
     const carrierHz=parseInt(document.getElementById('binaural-carrier-sl').value)||200;
@@ -1198,6 +1192,29 @@ function startNatureGraph(type, gainNode) {
 
     binauralOscL=oscL; binauralOscR=oscR;
     nodes.push(oscL,oscR,panL,panR,envL,envR);
+  } else if (type==='isochronic') {
+    const beatHz=parseFloat(document.getElementById('binaural-beat-sl').value)||10;
+    const carrierHz=parseInt(document.getElementById('binaural-carrier-sl').value)||200;
+
+    // Single carrier amplitude-modulated at the beat frequency
+    // — audible through speakers, no headphones needed
+    const osc=ctx.createOscillator(); osc.type='sine'; osc.frequency.value=carrierHz;
+    const lfo=ctx.createOscillator(); lfo.type='sine'; lfo.frequency.value=beatHz;
+
+    // LFO swings carrier gain between 0 and 1 (full depth)
+    const oscGain=ctx.createGain(); oscGain.gain.value=0.5;
+    const lfoGain=ctx.createGain(); lfoGain.gain.value=0.5;
+    lfo.connect(lfoGain); lfoGain.connect(oscGain.gain);
+
+    const env=ctx.createGain();
+    env.gain.setValueAtTime(0,ctx.currentTime);
+    env.gain.linearRampToValueAtTime(1,ctx.currentTime+2.5);
+
+    osc.connect(oscGain); oscGain.connect(env); env.connect(gainNode);
+    osc.start(); lfo.start();
+
+    isochronicOsc=osc; isochronicLfo=lfo;
+    nodes.push(osc,lfo,oscGain,lfoGain,env);
   }
   return nodes;
 }
@@ -1226,6 +1243,7 @@ function startNoise(){
 function stopNoise(){
   if(noiseGainNode){
     const t=ctx.currentTime;
+    noiseGainNode.gain.cancelScheduledValues(t);
     noiseGainNode.gain.setValueAtTime(noiseGainNode.gain.value,t);
     noiseGainNode.gain.linearRampToValueAtTime(0,t+NOISE_FADE_OUT);
   }
@@ -1234,7 +1252,7 @@ function stopNoise(){
   if(birdsTimer){clearTimeout(birdsTimer);birdsTimer=null;}
   if(noiseRandTimer){clearTimeout(noiseRandTimer);noiseRandTimer=null;}
   noiseSource=null; noiseFilter=null; noiseGainNode=null; noiseExtraNodes=[];
-  binauralOscL=null; binauralOscR=null;
+  binauralOscL=null; binauralOscR=null; isochronicOsc=null; isochronicLfo=null;
   noisePlaying=false; setNoise(false);
 }
 noiseBtn.addEventListener('click',()=>{if(noisePlaying)stopNoise();else startNoise();});
@@ -1243,12 +1261,10 @@ document.querySelectorAll('.noise-pill').forEach(btn=>{
     noiseType=btn.dataset.noise;
     document.querySelectorAll('.noise-pill').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
-    // Hide frequency slider for nature sounds (it doesn't apply)
     const freqRow=document.getElementById('noise-freq-row');
     if(freqRow) freqRow.style.display=isNatureSound(noiseType)?'none':'flex';
-    // Show binaural controls only when binaural is selected
     const binCtrl=document.getElementById('binaural-controls');
-    if(binCtrl) binCtrl.style.display=noiseType==='binaural'?'block':'none';
+    if(binCtrl) binCtrl.style.display=(noiseType==='binaural'||noiseType==='isochronic')?'block':'none';
     if(noisePlaying){stopNoise();startNoise();}
     saveSettings();
   });
@@ -1320,7 +1336,7 @@ noiseSpeedSl.addEventListener('input', updateSpeedLabels);
 
 document.getElementById('rand-noise-vol').addEventListener('change', e => {
   noiseSpeedSl.disabled = !e.target.checked;
-  noiseSpeedSl.style.opacity = e.target.checked ? '' : '';
+  document.getElementById('noise-speed-row').style.opacity = e.target.checked ? '1' : '0.2';
   if (e.target.checked) {
     scheduleNoiseRand();
   } else {
@@ -1375,6 +1391,9 @@ binBeatSl.addEventListener('input',()=>{
     const carrier=parseInt(binCarrierSl.value);
     binauralOscR.frequency.setTargetAtTime(carrier+v,ctx.currentTime,0.1);
   }
+  if(isochronicLfo&&noisePlaying){
+    isochronicLfo.frequency.setTargetAtTime(v,ctx.currentTime,0.1);
+  }
 });
 
 binCarrierSl.addEventListener('input',()=>{
@@ -1385,6 +1404,9 @@ binCarrierSl.addEventListener('input',()=>{
   if(binauralOscL&&binauralOscR&&noisePlaying){
     binauralOscL.frequency.setTargetAtTime(carrier,ctx.currentTime,0.1);
     binauralOscR.frequency.setTargetAtTime(carrier+beat,ctx.currentTime,0.1);
+  }
+  if(isochronicOsc&&noisePlaying){
+    isochronicOsc.frequency.setTargetAtTime(carrier,ctx.currentTime,0.1);
   }
 });
 
