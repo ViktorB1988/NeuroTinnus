@@ -238,41 +238,28 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
     <div class="tab-panel active" id="panel-session">
 
       <!-- Arc dial -->
-      <div class="arc-card" style="padding:10px 15px 12px">
+      <div class="arc-card">
+        <div class="arc-hint" style="margin-bottom:10px">What does your tinnitus frequency sound like?</div>
         <div class="arc-svg-wrap" id="arc-wrap" aria-label="Tinnitus frequency dial">
-          <svg id="arc-svg" viewBox="0 0 280 235" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;overflow:visible">
-            <!-- Track & progress arcs -->
-            <path id="arc-bg"   fill="none" stroke-width="8" stroke-linecap="round"/>
-            <path id="arc-prog" fill="none" stroke-width="8" stroke-linecap="round"/>
+          <svg id="arc-svg" viewBox="0 0 220 95" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;overflow:visible">
+            <!-- Background arc -->
+            <path id="arc-bg"   fill="none" stroke-width="6" stroke-linecap="round"/>
+            <!-- Progress arc -->
+            <path id="arc-prog" fill="none" stroke-width="6" stroke-linecap="round"/>
             <!-- Thumb -->
-            <circle id="arc-thumb" r="10" stroke-width="3"/>
-            <!-- Endpoint labels -->
-            <text id="arc-lbl-min" text-anchor="middle" font-size="11" font-family="Figtree,sans-serif"></text>
-            <text id="arc-lbl-max" text-anchor="middle" font-size="11" font-family="Figtree,sans-serif"></text>
-            <!-- Inner content: caption -->
-            <text text-anchor="middle" x="140" y="83" font-size="9" font-weight="600"
-                  font-family="Figtree,sans-serif" letter-spacing="1.5" style="fill:var(--muted)">FREQUENCY</text>
-            <!-- Frequency value (updated by JS) -->
-            <text id="arc-freq-text" text-anchor="middle" x="140" y="118"
-                  font-family="Figtree,sans-serif"></text>
-            <!-- Preview button -->
-            <g id="arc-prev-g" style="cursor:pointer" role="button" aria-label="Preview tone">
-              <circle id="arc-prev-bg" cx="140" cy="155" r="18" stroke-width="2.5"/>
-              <g id="arc-prev-play">
-                <polygon id="arc-prev-play-icon" points="137,149 137,161 150,155"/>
-              </g>
-              <g id="arc-prev-pause" style="display:none">
-                <rect x="133" y="149" width="5" height="12" rx="1" id="arc-pp-l"/>
-                <rect x="142" y="149" width="5" height="12" rx="1" id="arc-pp-r"/>
-              </g>
-            </g>
-            <!-- Preview label -->
-            <text text-anchor="middle" x="140" y="188" font-size="9" font-weight="500"
-                  font-family="Figtree,sans-serif" letter-spacing="0.8" style="fill:var(--muted)">PREVIEW TONE</text>
+            <circle id="arc-thumb" r="9" stroke-width="3"/>
+            <!-- Frequency display inside arc -->
+            <text id="arc-freq-el" text-anchor="middle" x="110" y="58" font-family="Figtree,sans-serif"></text>
+            <!-- Labels -->
+            <text id="arc-lbl-min" text-anchor="start"  font-size="10" font-family="Figtree,sans-serif">100 Hz</text>
+            <text id="arc-lbl-max" text-anchor="end"    font-size="10" font-family="Figtree,sans-serif">12 kHz</text>
           </svg>
         </div>
         <input type="range" id="tinnitus-slider" min="100" max="12000" step="10" value="2660" style="display:none">
-        <div id="prev-wrap" style="display:none"></div>
+        <div class="arc-row">
+          <span style="font-size:11px;color:var(--muted)">Preview your tone</span>
+          <div id="prev-wrap"></div>
+        </div>
       </div>
 
       <!-- Play + volume combined -->
@@ -283,24 +270,114 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
         </div>
         <!-- subtle vertical divider -->
         <div style="width:0.5px;height:44px;background:var(--border);flex-shrink:0;border-radius:1px;"></div>
-        <div style="flex:1;display:flex;flex-direction:column;gap:9px;min-width:0;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;opacity:0.55">
-              <path d="M11 5L6 9H2v6h4l5 4V5z" fill="var(--primary)"/>
-              <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-            <span id="main-label" style="font-size:10px;font-weight:600;color:var(--muted);letter-spacing:0.6px;text-transform:uppercase;flex:1;">PLAY THERAPY</span>
-            <span class="vol-pct-badge" id="mvlbl">20%</span>
+        <div style="flex:1;display:flex;align-items:center;gap:8px;min-width:0;">
+          <div style="flex:1;min-width:0;display:flex;align-items:center;">
+            <input type="range" class="vol-hero-sl" id="master-vol" min="0" max="100" step="1" value="20">
           </div>
-          <input type="range" class="vol-hero-sl" id="master-vol" min="0" max="100" step="1" value="20">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;opacity:0.55">
+            <path d="M11 5L6 9H2v6h4l5 4V5z" fill="var(--primary)"/>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span class="vol-pct-badge" id="mvlbl">20%</span>
         </div>
       </div>
       <!-- Sequence progress -->
       <div class="seq-track" id="seq-track"></div>
       <div class="status-line" id="status"></div>
 
-      <!-- Noise strip -->
-      <div class="section-lbl">Background Noise</div>
+      <!-- ── Tone settings (collapsible) ──────────────────────────────────── -->
+      <button id="adv-toggle" onclick="
+        const body=document.getElementById('adv-body');
+        const arrow=document.getElementById('adv-arrow');
+        const open=body.style.display!=='none';
+        body.style.display=open?'none':'flex';
+        arrow.style.transform=open?'':'rotate(180deg)';
+      " style="
+        display:flex;align-items:center;justify-content:space-between;
+        width:100%;cursor:pointer;gap:8px;
+        background:var(--card);border:0.5px solid var(--border);
+        border-radius:12px;padding:11px 14px;
+        transition:background 0.15s;margin-top:-4px;
+      "
+      onmouseover="this.style.background='var(--btn-hover)'"
+      onmouseout="this.style.background='var(--card)'">
+        <span style="font-size:12px;font-weight:600;color:var(--text);letter-spacing:-0.1px;">Tone settings</span>
+        <svg id="adv-arrow" viewBox="0 0 24 24" width="15" height="15" fill="none"
+             style="flex-shrink:0;transition:transform 0.2s;color:var(--muted)">
+          <polyline points="6 9 12 15 18 9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <div id="adv-body" style="display:none;flex-direction:column;gap:12px;">
+        <div class="section-lbl">Waveform</div>
+        <div class="card">
+          <div class="waveform-row">
+            <span class="waveform-lbl">Type</span>
+            <div class="waveform-btns">
+              <button class="wf-btn active" data-wave="sine">Sine</button>
+              <button class="wf-btn" data-wave="triangle">Triangle</button>
+              <button class="wf-btn" data-wave="sawtooth">Sawtooth</button>
+              <button class="wf-btn" data-wave="square">Square</button>
+            </div>
+          </div>
+          <div class="check-row">
+            <input type="checkbox" id="rand-wave">
+            <label for="rand-wave">Randomize waveform per sequence</label>
+          </div>
+        </div>
+
+        <div class="section-lbl">Timing</div>
+        <div class="card">
+          <div class="vol-strip">
+            <span class="vol-lbl">Break between tones</span>
+            <input type="range" id="tone-break-sl" min="0" max="500" step="10" value="0">
+            <span class="vol-val" id="tone-break-lbl">0 ms</span>
+          </div>
+          <div class="vol-strip" style="margin-top:10px">
+            <span class="vol-lbl">Break after sequence</span>
+            <input type="range" id="seq-break-sl" min="0" max="5000" step="100" value="1000">
+            <span class="vol-val" id="seq-break-lbl">1 s</span>
+          </div>
+          <div class="check-row">
+            <input type="checkbox" id="rand-seq-break">
+            <label for="rand-seq-break">Random break after sequence (0 – 5 s)</label>
+          </div>
+        </div>
+
+        <div class="section-lbl">Therapy Tones Volume</div>
+        <div class="card">
+          <div id="therapy-rows"></div>
+          <div class="check-row">
+            <input type="checkbox" id="rand-vol">
+            <label for="rand-vol">Randomize volume</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Noise strip (collapsible) -->
+      <button id="noise-toggle" onclick="
+        const body=document.getElementById('noise-body');
+        const arrow=document.getElementById('noise-arrow');
+        const open=body.style.display!=='none';
+        body.style.display=open?'none':'flex';
+        arrow.style.transform=open?'':'rotate(180deg)';
+      " style="
+        display:flex;align-items:center;justify-content:space-between;
+        width:100%;cursor:pointer;gap:8px;
+        background:var(--card);border:0.5px solid var(--border);
+        border-radius:12px;padding:11px 14px;
+        transition:background 0.15s;
+      "
+      onmouseover="this.style.background='var(--btn-hover)'"
+      onmouseout="this.style.background='var(--card)'">
+        <span style="font-size:12px;font-weight:600;color:var(--text);letter-spacing:-0.1px;">Background Noise</span>
+        <svg id="noise-arrow" viewBox="0 0 24 24" width="15" height="15" fill="none"
+             style="flex-shrink:0;transition:transform 0.2s;color:var(--muted)">
+          <polyline points="6 9 12 15 18 9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <div id="noise-body" style="display:none;flex-direction:column;gap:0;">
       <div class="card noise-card">
 
         <!-- Play + volume row — same pattern as main play card -->
@@ -309,16 +386,43 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
             <div id="noise-btn-wrap"></div>
           </div>
           <div style="width:0.5px;height:44px;background:var(--border);flex-shrink:0;border-radius:1px;"></div>
-          <div style="flex:1;display:flex;flex-direction:column;gap:9px;min-width:0;">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;opacity:0.55">
-                <path d="M11 5L6 9H2v6h4l5 4V5z" fill="var(--primary)"/>
-                <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-              <span style="font-size:10px;font-weight:600;color:var(--muted);letter-spacing:0.6px;text-transform:uppercase;flex:1;">NOISE VOLUME</span>
-              <span class="vol-pct-badge" id="noise-vol-lbl">50%</span>
+          <div style="flex:1;display:flex;align-items:center;gap:8px;min-width:0;">
+            <div style="flex:1;min-width:0;display:flex;align-items:center;">
+              <input type="range" class="vol-hero-sl" id="noise-vol" min="0" max="100" step="1" value="50">
             </div>
-            <input type="range" class="vol-hero-sl" id="noise-vol" min="0" max="100" step="1" value="50">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;opacity:0.55">
+              <path d="M11 5L6 9H2v6h4l5 4V5z" fill="var(--primary)"/>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <span class="vol-pct-badge" id="noise-vol-lbl">50%</span>
+          </div>
+        </div>
+
+        <!-- Frequency slider (hidden for nature/binaural) -->
+        <div class="vol-strip" id="noise-freq-row" style="margin-bottom:10px">
+          <span class="vol-lbl" style="font-size:13px">Frequency</span>
+          <input type="range" class="vol-hero-sl" id="noise-freq-sl" min="100" max="12000" step="10" value="1000">
+          <span class="vol-val" id="noise-freq-lbl">1 kHz</span>
+        </div>
+
+        <!-- Binaural controls (shown only for binaural) -->
+        <div id="binaural-controls" style="display:none;margin-bottom:12px">
+          <div class="vol-strip" style="margin-bottom:6px">
+            <span class="vol-lbl" style="font-size:12px">Beat</span>
+            <input type="range" id="binaural-beat-sl" min="1" max="40" step="0.5" value="10">
+            <span class="vol-val" id="binaural-beat-lbl">10 Hz</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:10px;padding:0 2px">
+            <span class="beat-lbl" data-beat="2"  style="font-size:10px;cursor:pointer;color:var(--muted)">δ Delta</span>
+            <span class="beat-lbl" data-beat="6"  style="font-size:10px;cursor:pointer;color:var(--muted)">θ Theta</span>
+            <span class="beat-lbl" data-beat="10" style="font-size:10px;cursor:pointer;color:var(--primary);font-weight:600">α Alpha</span>
+            <span class="beat-lbl" data-beat="20" style="font-size:10px;cursor:pointer;color:var(--muted)">β Beta</span>
+            <span class="beat-lbl" data-beat="40" style="font-size:10px;cursor:pointer;color:var(--muted)">γ Gamma</span>
+          </div>
+          <div class="vol-strip">
+            <span class="vol-lbl" style="font-size:12px">Carrier</span>
+            <input type="range" id="binaural-carrier-sl" min="80" max="500" step="5" value="200">
+            <span class="vol-val" id="binaural-carrier-lbl">200 Hz</span>
           </div>
         </div>
 
@@ -356,32 +460,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
         <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px">
           <button class="noise-pill" data-noise="binaural">🎵 Binaural</button>
         </div>
-        <div id="binaural-controls" style="display:none;margin-bottom:12px">
-          <div class="vol-strip" style="margin-bottom:6px">
-            <span class="vol-lbl" style="font-size:12px">Beat</span>
-            <input type="range" id="binaural-beat-sl" min="1" max="40" step="0.5" value="10">
-            <span class="vol-val" id="binaural-beat-lbl">10 Hz</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;margin-bottom:10px;padding:0 2px">
-            <span class="beat-lbl" data-beat="2"  style="font-size:10px;cursor:pointer;color:var(--muted)">δ Delta</span>
-            <span class="beat-lbl" data-beat="6"  style="font-size:10px;cursor:pointer;color:var(--muted)">θ Theta</span>
-            <span class="beat-lbl" data-beat="10" style="font-size:10px;cursor:pointer;color:var(--primary);font-weight:600">α Alpha</span>
-            <span class="beat-lbl" data-beat="20" style="font-size:10px;cursor:pointer;color:var(--muted)">β Beta</span>
-            <span class="beat-lbl" data-beat="40" style="font-size:10px;cursor:pointer;color:var(--muted)">γ Gamma</span>
-          </div>
-          <div class="vol-strip">
-            <span class="vol-lbl" style="font-size:12px">Carrier</span>
-            <input type="range" id="binaural-carrier-sl" min="80" max="500" step="5" value="200">
-            <span class="vol-val" id="binaural-carrier-lbl">200 Hz</span>
-          </div>
-        </div>
 
-        <!-- Frequency + randomize -->
-        <div class="vol-strip" id="noise-freq-row" style="margin-bottom:10px">
-          <span class="vol-lbl" style="font-size:13px">Frequency</span>
-          <input type="range" class="vol-hero-sl" id="noise-freq-sl" min="100" max="12000" step="10" value="1000">
-          <span class="vol-val" id="noise-freq-lbl">1 kHz</span>
-        </div>
         <div class="check-row">
           <input type="checkbox" id="rand-noise-vol">
           <label for="rand-noise-vol">Randomize volume</label>
@@ -395,73 +474,13 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
           </div>
         </div>
       </div>
+      </div><!-- /noise-body -->
 
     </div><!-- /panel-session -->
 
-    <!-- ── SETTINGS tab ──────────────────────────────────────────────────── -->
-    <div class="tab-panel" id="panel-settings">
-
-      <div class="section-lbl">Waveform</div>
-      <div class="card">
-        <div class="waveform-row">
-          <span class="waveform-lbl">Type</span>
-          <div class="waveform-btns">
-            <button class="wf-btn active" data-wave="sine">Sine</button>
-            <button class="wf-btn" data-wave="triangle">Triangle</button>
-            <button class="wf-btn" data-wave="sawtooth">Sawtooth</button>
-            <button class="wf-btn" data-wave="square">Square</button>
-          </div>
-        </div>
-        <div class="check-row">
-          <input type="checkbox" id="rand-wave">
-          <label for="rand-wave">Randomize waveform per sequence</label>
-        </div>
-      </div>
-
-      <div class="section-lbl">Timing</div>
-      <div class="card">
-        <div class="vol-strip">
-          <span class="vol-lbl">Break between tones</span>
-          <input type="range" id="tone-break-sl" min="0" max="500" step="10" value="0">
-          <span class="vol-val" id="tone-break-lbl">0 ms</span>
-        </div>
-        <div class="vol-strip" style="margin-top:10px">
-          <span class="vol-lbl">Break after sequence</span>
-          <input type="range" id="seq-break-sl" min="0" max="5000" step="100" value="1000">
-          <span class="vol-val" id="seq-break-lbl">1 s</span>
-        </div>
-        <div class="check-row">
-          <input type="checkbox" id="rand-seq-break">
-          <label for="rand-seq-break">Random break after sequence (0 – 5 s)</label>
-        </div>
-      </div>
-
-      <div class="section-lbl">Therapy Tones Volume</div>
-      <div class="card">
-        <div id="therapy-rows"></div>
-        <div class="check-row">
-          <input type="checkbox" id="rand-vol">
-          <label for="rand-vol">Randomize volume</label>
-        </div>
-      </div>
-
-    </div><!-- /panel-settings -->
-
   </div><!-- /tab-content -->
 
-  <!-- Bottom tab bar -->
-  <div class="bottom-tabs">
-    <button class="tab-btn active" data-panel="panel-session">
-      <span class="t-icon">◎</span>
-      <div class="t-pip"></div>
-      <span class="t-lbl">Session</span>
-    </button>
-    <button class="tab-btn" data-panel="panel-settings">
-      <span class="t-icon">⚙</span>
-      <div class="t-pip"></div>
-      <span class="t-lbl">Settings</span>
-    </button>
-  </div>
+  <!-- Bottom tab bar removed — single-tab layout -->
 
 </div><!-- /app-shell -->
 
@@ -596,9 +615,9 @@ function setTrack(el,pct,col,bg){el.style.background=`linear-gradient(to right,$
 const P='var(--primary)',T='var(--track)';
 
 // ── Arc dial ───────────────────────────────────────────────────────────────
-// ARC_START=120°(lower-left) → ARC_END=420°(=60°, lower-right): 300° sweep clockwise through top
-const ARC_CX=140, ARC_CY=118, ARC_R=106;
-const ARC_START=120, ARC_END=420;
+// ── Arc dial ───────────────────────────────────────────────────────────────
+const ARC_CX=110, ARC_CY=110, ARC_R=88;
+const ARC_START=215, ARC_END=325; // degrees, clockwise in SVG
 
 function deg2rad(d){return d*Math.PI/180;}
 function arcPoint(deg){
@@ -635,16 +654,14 @@ function drawArc(){
   const fillCol =styles.getPropertyValue('--arc-fill').trim();
   const thumbCol=styles.getPropertyValue('--arc-thumb').trim();
   const mutedCol=styles.getPropertyValue('--muted').trim();
-  const primaryCol=styles.getPropertyValue('--primary').trim();
-  const btnBgCol=styles.getPropertyValue('--btn-bg').trim();
-  const freqCol=styles.getPropertyValue('--freq').trim();
-  const freqEmCol=styles.getPropertyValue('--freq-em').trim();
 
-  arcBg.setAttribute('d',arcPath(ARC_START,ARC_END));
+  const fullPath=arcPath(ARC_START,ARC_END);
+  arcBg.setAttribute('d',fullPath);
   arcBg.setAttribute('stroke',trackCol);
 
   const angle=hzToAngle(tinnitusHz);
-  arcProg.setAttribute('d',arcPath(ARC_START,Math.max(ARC_START+0.01,angle)));
+  const progPath=arcPath(ARC_START,angle);
+  arcProg.setAttribute('d',progPath);
   arcProg.setAttribute('stroke',fillCol);
 
   const tp=arcPoint(angle);
@@ -653,42 +670,27 @@ function drawArc(){
   arcThumb.setAttribute('fill',thumbCol);
   arcThumb.setAttribute('stroke',trackCol);
 
-  // Endpoint labels just below the arc endpoints
+  // Min/max labels at arc endpoints
   const minPt=arcPoint(ARC_START);
-  const maxPt=arcPoint(ARC_END);   // arcPoint(420) = arcPoint(60)
-  arcLblMin.setAttribute('x',minPt.x);
-  arcLblMin.setAttribute('y',(parseFloat(minPt.y)+17).toFixed(1));
+  const maxPt=arcPoint(ARC_END);
+  arcLblMin.setAttribute('x',(parseFloat(minPt.x)-2).toFixed(1));
+  arcLblMin.setAttribute('y',(parseFloat(minPt.y)+14).toFixed(1));
   arcLblMin.setAttribute('fill',mutedCol);
-  arcLblMin.textContent='100';
-  arcLblMax.setAttribute('x',maxPt.x);
-  arcLblMax.setAttribute('y',(parseFloat(maxPt.y)+17).toFixed(1));
+  arcLblMax.setAttribute('x',(parseFloat(maxPt.x)+2).toFixed(1));
+  arcLblMax.setAttribute('y',(parseFloat(maxPt.y)+14).toFixed(1));
   arcLblMax.setAttribute('fill',mutedCol);
-  arcLblMax.textContent='12k';
-
-  // Preview button colours
-  const prevBg=document.getElementById('arc-prev-bg');
-  if(prevBg){prevBg.setAttribute('fill',btnBgCol);prevBg.setAttribute('stroke',primaryCol);}
-  const playIcon=document.getElementById('arc-prev-play-icon');
-  if(playIcon)playIcon.setAttribute('fill',primaryCol);
-  ['arc-pp-l','arc-pp-r'].forEach(id=>{const el=document.getElementById(id);if(el)el.setAttribute('fill',primaryCol);});
-
   updFreqDisplay();
 }
 
+const arcFreqEl=document.getElementById('arc-freq-el');
 function updFreqDisplay(){
   const f=tinnitusHz;
   const styles=getComputedStyle(document.body);
-  const freqCol=styles.getPropertyValue('--freq').trim();
-  const freqEmCol=styles.getPropertyValue('--freq-em').trim();
-  const freqEl=document.getElementById('arc-freq-text');
-  if(freqEl){
-    if(f>=1000){
-      const val=(f/1000).toFixed(2).replace(/\.?0+$/,'');
-      freqEl.innerHTML=`<tspan font-size="28" font-weight="600" fill="${freqCol}">${val}</tspan><tspan font-size="14" fill="${freqEmCol}"> kHz</tspan>`;
-    } else {
-      freqEl.innerHTML=`<tspan font-size="28" font-weight="600" fill="${freqCol}">${Math.round(f)}</tspan><tspan font-size="14" fill="${freqEmCol}"> Hz</tspan>`;
-    }
-  }
+  const fc=styles.getPropertyValue('--freq').trim();
+  const ec=styles.getPropertyValue('--freq-em').trim();
+  const val=f>=1000?(f/1000).toFixed(2).replace(/\.?0+$/,''):String(f);
+  const unit=f>=1000?'kHz':'Hz';
+  arcFreqEl.innerHTML=`<tspan font-size="16" font-weight="600" fill="${fc}">${val}</tspan><tspan font-size="10" fill="${ec}" dx="3">${unit}</tspan>`;
   tFreqs().forEach((freq,i)=>{const el=document.getElementById('tl'+i);if(el)el.textContent=fmtHz(freq);});
 }
 drawArc();
@@ -700,15 +702,18 @@ function pointerToAngle(e){
   const rect=arcSvg.getBoundingClientRect();
   const clientX=e.touches?e.touches[0].clientX:e.clientX;
   const clientY=e.touches?e.touches[0].clientY:e.clientY;
-  const svgX=(clientX-rect.left)/rect.width*280;
-  const svgY=(clientY-rect.top)/rect.height*235;
+  const svgX=(clientX-rect.left)/rect.width*220;
+  const svgY=(clientY-rect.top)/rect.height*130;
   const dx=svgX-ARC_CX, dy=svgY-ARC_CY;
   let angle=Math.atan2(dy,dx)*180/Math.PI;
   if(angle<0)angle+=360;
-  // Angles in [0,60) belong to the end of the arc → map to [360,420)
-  if(angle<60)angle+=360;
-  // Gap region [60,120): snap to nearest endpoint
-  if(angle<ARC_START){angle=angle<90?ARC_END:ARC_START;}
+  // Clamp to arc range [ARC_START, ARC_END]
+  if(angle<ARC_START){
+    // In the gap region — snap to nearest endpoint
+    const dStart=ARC_START-angle;
+    const dEnd=360-ARC_END+angle;
+    angle=dStart<dEnd?ARC_START:ARC_END;
+  }
   return Math.max(ARC_START,Math.min(ARC_END,angle));
 }
 function applyArcAngle(angle){
@@ -802,21 +807,10 @@ function stopToneWithFade(osc,gainNode,when){
 }
 
 // ── Preview ────────────────────────────────────────────────────────────────
-// Sync the SVG play/pause icon inside the arc dial
-function syncPrevSvg(playing){
-  const pg=document.getElementById('arc-prev-play');
-  const pa=document.getElementById('arc-prev-pause');
-  if(pg)pg.style.display=playing?'none':'';
-  if(pa)pa.style.display=playing?'':'none';
-}
-
-// SVG preview button delegates to prevBtn
-document.getElementById('arc-prev-g').addEventListener('click',()=>prevBtn.click());
-
 prevBtn.addEventListener('click',()=>{
   if(previewPlaying){
     stopToneWithFade(previewOsc,previewOsc._gain,ctx.currentTime);
-    previewOsc=null;previewPlaying=false;setPrev(false);syncPrevSvg(false);
+    previewOsc=null;previewPlaying=false;setPrev(false);
     document.getElementById('status').textContent='';
   } else {
     stopTherapy();initAudio();
@@ -826,7 +820,7 @@ prevBtn.addEventListener('click',()=>{
     osc._gain=g;
     startToneWithFade(osc,g,0.3,ctx.currentTime);
     osc.start(ctx.currentTime);
-    previewOsc=osc;previewPlaying=true;setPrev(true);syncPrevSvg(true);
+    previewOsc=osc;previewPlaying=true;setPrev(true);
     document.getElementById('status').textContent='Previewing tinnitus tone';
   }
 });
@@ -838,7 +832,7 @@ function stopTherapy(){
   currentOscGain=null;therapyPlaying=false;seqPos=0;currentSeq=[];
   clearRows();seqEl.innerHTML='';dots=[];setMain(false);
   mainBtn.classList.remove('main-btn-pulse');
-  document.getElementById('main-label').textContent='PLAY THERAPY';
+
   document.getElementById('status').textContent='';
   document.querySelectorAll('.wf-btn').forEach(b=>b.classList.toggle('active',b.dataset.wave===currentWaveform));
 }
@@ -887,14 +881,14 @@ function playNext(){
 mainBtn.addEventListener('click',()=>{
   if(therapyPlaying){stopTherapy();}
   else{
-    if(previewPlaying){stopToneWithFade(previewOsc,previewOsc._gain,ctx.currentTime);previewOsc=null;previewPlaying=false;setPrev(false);syncPrevSvg(false);}
+    if(previewPlaying){stopToneWithFade(previewOsc,previewOsc._gain,ctx.currentTime);previewOsc=null;previewPlaying=false;setPrev(false);}
     initAudio();therapyPlaying=true;
     seqLen=randSeqLen();currentSeq=randSeq(seqLen);seqPos=0;
     const WF=['sine','triangle','sawtooth','square'];
     seqWaveform=document.getElementById('rand-wave').checked?WF[Math.floor(Math.random()*WF.length)]:currentWaveform;
     buildDots(seqLen);setMain(true);
     mainBtn.classList.add('main-btn-pulse');
-    document.getElementById('main-label').textContent='STOP THERAPY';
+
     playNext();
   }
 });
